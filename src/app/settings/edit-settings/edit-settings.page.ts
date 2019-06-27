@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import { SymptomActionService } from 'src/app/services/symptomaction.service';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
+import { Camera, CameraOptions } from '@ionic-native/camera/ngx';
 
 @Component({
   selector: 'app-edit-settings',
@@ -28,7 +29,7 @@ export class EditSettingsPage implements OnInit {
     tamil: ''
   })
 
-  constructor(private activatedRoute: ActivatedRoute, private settingService: SymptomActionService, public formBuilder: FormBuilder, private router:Router) { }
+  constructor(private activatedRoute: ActivatedRoute, private settingService: SymptomActionService, public formBuilder: FormBuilder, private router:Router, private camera: Camera) { }
 
   ngOnInit() {
     this.editID = this.activatedRoute.snapshot.paramMap.get("id");
@@ -74,5 +75,24 @@ export class EditSettingsPage implements OnInit {
   goBack() {
     //this.router.navigate(['/tabs/settings/symptomAction'])
     this.router.navigateByUrl("/tabs/settings/symptomAction"); //https://stackoverflow.com/questions/41678356/router-navigate-does-not-call-ngoninit-when-same-page
+  }
+
+  myPhoto: any;
+
+  takePhoto(sourceType: number) {
+    const options: CameraOptions = {
+      quality: 50,
+      destinationType: this.camera.DestinationType.DATA_URL,
+      encodingType: this.camera.EncodingType.JPEG,
+      mediaType: this.camera.MediaType.PICTURE,
+      correctOrientation: true,
+      sourceType:sourceType,
+    }
+
+    this.camera.getPicture(options).then((imageData) => {
+      let base64Image = 'data:image/jpeg;base64,' + imageData;
+    }, (err) => {
+      // Handle error
+    });
   }
 }
