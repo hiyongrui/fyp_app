@@ -23,8 +23,25 @@ export class SymptomActionService {
   }
   
   iconArray = ["assets/cough.svg", "assets/ambulance.svg", "assets/medication.svg", "assets/noshortness.svg", "assets/temperature.svg"]
+  
+  readImage(icon) {
+    return new Promise(resolve => {
+      var reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(icon);
+    });
+  }
+  convertToBlob(base64Image) { 
+    return fetch(base64Image).then(res => res.blob()) //https://stackoverflow.com/questions/16245767/creating-a-blob-from-a-base64-string-in-javascript
+  }
 
-  addReusable(type, item) {
+  async addReusable(type, item) {
+    if (item.icon !== "assets/empty.svg") {
+      await this.convertToBlob(item.icon).then((val) => {
+        item.icon = val;
+      })
+    }
+
     if (type == "Symptom") {
       var settingObj: Setting = {
         id: uuid(),
@@ -32,7 +49,7 @@ export class SymptomActionService {
         chName: item.chName,
         myName: item.myName,
         tmName: item.tmName,
-        icon: this.iconArray[Math.floor(Math.random() * this.iconArray.length)]
+        icon: item.icon || this.iconArray[Math.floor(Math.random() * this.iconArray.length)]
       };
     }
     else {
@@ -42,7 +59,7 @@ export class SymptomActionService {
         chName: item.chName,
         myName: item.myName,
         tmName: item.tmName,
-        icon: this.iconArray[Math.floor(Math.random() * this.iconArray.length)]
+        icon: item.icon || this.iconArray[Math.floor(Math.random() * this.iconArray.length)]
       }
     }
     console.log("adding reusable item = " + JSON.stringify(item));
