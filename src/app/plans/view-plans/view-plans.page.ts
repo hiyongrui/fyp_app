@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { PlanService } from './../../services/plan.service';
-import { ActionSheetController, Events, IonList } from '@ionic/angular';
+import { ActionSheetController, IonList } from '@ionic/angular';
 import { TemplateService } from 'src/app/services/template.service';
 
 
@@ -12,8 +12,7 @@ import { TemplateService } from 'src/app/services/template.service';
 })
 export class ViewPlansPage implements OnInit {
 
-  constructor(private router: Router, private planService: PlanService, public actionSheetController: ActionSheetController, 
-    private event: Events, private templateService: TemplateService) {
+  constructor(private router: Router, private planService: PlanService, public actionSheetController: ActionSheetController, private templateService: TemplateService) {
 
   }
   details: any;

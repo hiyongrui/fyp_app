@@ -252,14 +252,14 @@ export class EditplanPage implements OnInit {
 
   @ViewChild('mylist')mylist: IonList;
   @ViewChild('apptList')apptList: IonList;
-  deleteIOSAppointment(item) {
-    this.templateService.deleteIOSAppointment(item);
+  deleteIOSAppointment(apptIndex) {
+    this.templateService.deleteIOSAppointment(apptIndex);
     this.apptList.closeSlidingItems();
     this.templateService.presentToastWithOptions("Deleted appointment!");
   }
 
-  deleteIOS(thisItem, arrayID, mainID, combinedID) {
-    this.templateService.deleteIOS(thisItem, arrayID, mainID, combinedID);
+  deleteIOS(arrayID, symptomIndex, actionIndex) {
+    this.templateService.deleteIOS(arrayID, symptomIndex, actionIndex);
     this.mylist.closeSlidingItems();
     this.templateService.presentToastWithOptions("Deleted action!");
   }

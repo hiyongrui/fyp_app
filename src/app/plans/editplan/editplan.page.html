@@ -328,8 +328,8 @@
 
           <ion-col size="6" *ngIf="item.combined.length == 0" style="border-left: 2.5px solid #d3d3d3"></ion-col>
 
-          <ng-container *ngFor="let x of item.combined; let actIndex = index;">
-            <ion-col size="6" *ngIf="actIndex != 0"></ion-col>
+          <ng-container *ngFor="let x of item.combined; let actionIndex = index;">
+            <ion-col size="6" *ngIf="actionIndex != 0"></ion-col>
             <ion-col size="6" style="border-left: 2.5px solid #d3d3d3">
               <ion-row>
                 <ion-col no-padding size="5.25" align-self-center>
@@ -355,7 +355,7 @@
       <ion-list style="background-color: #d3d3d3" #mylist
         [ngClass]="globalItem.toggle ? 'addPaddingTopBottom' : 'removePaddingTopBottom'" *ngIf="!isDisabled">
 
-        <ion-row *ngFor="let item of getArray(globalItem.id); let i = index; let last = last" [style.border-bottom]="!last && '2px solid #A9A9A9'"
+        <ion-row *ngFor="let item of getArray(globalItem.id); let symptomIndex = index; let last = last" [style.border-bottom]="!last && '2px solid #A9A9A9'"
           [ngClass]="{'blur': globalItem.toggle}">
 
           <!-- first column aka symptom -->
@@ -388,18 +388,18 @@
           </ion-col>
 
           <!-- for each second column aka action -->
-          <ng-container *ngFor="let x of item.combined; let actIndex = index;">
+          <ng-container *ngFor="let x of item.combined; let actionIndex = index;">
 
             <ion-col [size]="checked.length > 0 ? 5.25 : 6" [ngClass]="{'highlight': x.whatsapp && checked.length > 0}"
               (press)="pressEvent('Action', x, globalItem.id, item.symptom.id)"
-              (click)="checked.length > 0 && clickEvent('Action', x, globalItem.id, item.symptom.id)" *ngIf="actIndex != 0">
+              (click)="checked.length > 0 && clickEvent('Action', x, globalItem.id, item.symptom.id)" *ngIf="actionIndex != 0">
             </ion-col>
 
             <ion-col [size]="checked.length > 0 ? 5.25 : 6" [ngClass]="{'highlight': x.whatsapp && checked.length > 0}"
-              (press)="actIndex == 0 ? pressEvent('Symptom', item, globalItem.id, item.symptom.id) : pressEvent('Action', x, globalItem.id, item.symptom.id);"
+              (press)="actionIndex == 0 ? pressEvent('Symptom', item, globalItem.id, item.symptom.id) : pressEvent('Action', x, globalItem.id, item.symptom.id);"
               (click)="checked.length > 0 && clickEvent('Action', x, globalItem.id, item.symptom.id)">
 
-              <ion-item-sliding (ionSwipe)="checked.length == 0 && deleteIOS(x, globalItem.id, i, actIndex)"
+              <ion-item-sliding (ionSwipe)="checked.length == 0 && deleteIOS(globalItem.id, symptomIndex, actionIndex)"
                 (ionDrag)="checked.length > 0 && dragAndCheckLongPress(slidingItem)" #slidingItem>
                 <ion-item appShadowCss [customCSS]="[x.whatsapp, 'newTemplate']" class="removeBorder">
 
@@ -428,7 +428,7 @@
                 <ion-item-options side="end"
                   [ngStyle]="{'padding-bottom': android ? '8px' : '16px', 'padding-top': '8px'}">
                   <ion-item-option color="danger" expandable
-                    (click)="checked.length == 0 && deleteIOS(x, globalItem.id, i, actIndex)">
+                    (click)="checked.length == 0 && deleteIOS(globalItem.id, symptomIndex, actionIndex)">
                     <ion-icon name="trash" slot="top" style="zoom:2.0"></ion-icon> DELETE
                   </ion-item-option>
                 </ion-item-options>
@@ -438,7 +438,7 @@
             </ion-col>
 
             <ion-col size="1.5" *ngIf="checked.length > 0" [ngClass]="{'highlight': x.whatsapp}"
-              style="display:flex;align-items:center;" (click)="clickEvent('Action', x, globalItem.id, i, actIndex)">
+              style="display:flex;align-items:center;" (click)="clickEvent('Action', x, globalItem.id, actionIndex)">
               <ion-checkbox [checked]="x.whatsapp" mode="ios" color="success"></ion-checkbox>
             </ion-col>
 
@@ -543,7 +543,7 @@
           <ion-item-sliding *ngFor="let info of getApptArray(); let apptIndex = index;"
             [ngClass]="{'highlight': info.whatsapp && checked.length > 0}"
             (press)="pressEvent('appt', info, 4, apptIndex)"
-            (ionSwipe)="checked.length == 0 && deleteIOSAppointment(info)"
+            (ionSwipe)="checked.length == 0 && deleteIOSAppointment(apptIndex)"
             (ionDrag)="checked.length > 0 && dragAndCheckLongPress(slidingItem)" #slidingItem>
 
             <ion-item lines="none" appShadowCss [customCSS]="[info.whatsapp, 'planDetails']">
@@ -580,7 +580,7 @@
             </ion-item>
 
             <ion-item-options side="end">
-              <ion-item-option color="danger" expandable (click)="deleteIOSAppointment(info)">
+              <ion-item-option color="danger" expandable (click)="deleteIOSAppointment(apptIndex)">
                 <ion-icon name="trash" slot="top" style="zoom:1.5"></ion-icon> DELETE
               </ion-item-option>
             </ion-item-options>

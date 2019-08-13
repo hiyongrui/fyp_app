@@ -6,22 +6,22 @@ import { SymptomActionService } from './symptomaction.service';
 import { ActionSheetController, ToastController, AlertController, PopoverController, ModalController, Platform } from '@ionic/angular';
 import { TemplatePopComponent } from './../templates/template-pop/template-pop.component';
 
-const ALL_KEY = "allKey";
+const TEMPLATE_KEY = "templateKey";
 @Injectable({
   providedIn: 'root'
 })
 export class TemplateService {
 
-  constructor(private storage: Storage, private settingStorage: SymptomActionService, private actionSheetCtrl: ActionSheetController, private zone: NgZone, 
+  constructor(private storage: Storage, private settingService: SymptomActionService, private actionSheetCtrl: ActionSheetController, private zone: NgZone, 
     private toastCtrl: ToastController, private alertCtrl: AlertController, private popoverCtrl: PopoverController, private modalCtrl: ModalController, private plt: Platform) { }
 
   createTemplate(finalArray, templateNameFromInput, templateID, templateNameUpdate, defaultLanguage) {
-    return this.getAllTemplate(ALL_KEY).then(data => {
+    return this.getAllTemplate(TEMPLATE_KEY).then(data => {
       data = data || [];
       var result = {templates: finalArray, id: templateID || uuid(), name: templateNameFromInput || templateNameUpdate, language: defaultLanguage}; //https://stackoverflow.com/questions/42120358/change-property-in-array-with-spread-operator-returns-object-instead-of-array
       templateNameFromInput ? data.push(result) 
         : data[data.findIndex(item => item.id === templateID)] = result
-      return this.storage.set(ALL_KEY, data)
+      return this.storage.set(TEMPLATE_KEY, data)
     })
   } 
 
@@ -30,31 +30,31 @@ export class TemplateService {
   }
   
   getOneTemplate(id) {
-    return this.getAllTemplate(ALL_KEY).then(data => {
+    return this.getAllTemplate(TEMPLATE_KEY).then(data => {
       return data.find(item => item.id == id);
     })
   }
 
   renameTemplate(name, templateID) {
-    return this.getAllTemplate(ALL_KEY).then(data => {
+    return this.getAllTemplate(TEMPLATE_KEY).then(data => {
       data.find(item => item.id === templateID).name = name;
-      return this.storage.set(ALL_KEY, data);
+      return this.storage.set(TEMPLATE_KEY, data);
     })
   }
   
   duplicateTemplate(name, templateID) {
-    return this.getAllTemplate(ALL_KEY).then(data => {
+    return this.getAllTemplate(TEMPLATE_KEY).then(data => {
       let itemFound = data.find(item => item.id === templateID);
       let duplicatedItem = {...itemFound, id: uuid(), name: name}
       data.push(duplicatedItem);
-      return this.storage.set(ALL_KEY, data);
+      return this.storage.set(TEMPLATE_KEY, data);
     })
   }
 
   deleteTemplate(templateID) {
-    return this.getAllTemplate(ALL_KEY).then(data => {
+    return this.getAllTemplate(TEMPLATE_KEY).then(data => {
       data.splice(data.findIndex(item => item.id === templateID), 1);
-      return this.storage.set(ALL_KEY, data);
+      return this.storage.set(TEMPLATE_KEY, data);
     })
   }
 
@@ -74,41 +74,36 @@ export class TemplateService {
     this.appointment.push(apptObj);
   }
 
-  pressEvent(type, thisObject, arrayID, combinedIndex) {
+  pressEvent(type, thisObject, arrayID, symptomID) {
     if (this.checked.length == 0) {
       let dynamicObj = type == "Symptom" ? thisObject.combined : [thisObject];
-      dynamicObj.forEach(element => {
-        element.whatsapp = true;
-        this.checked.push({element, arrayID, combinedIndex});
+      dynamicObj.forEach(thisObj => {
+        thisObj.whatsapp = true;
+        this.checked.push({thisObj, arrayID, symptomID});
       });
     }
   }
 
-  clickEvent(type, wholeItem, arrayID, combinedIndex) {
-    let element = type == "Symptom" ? wholeItem.combined[0] : wholeItem
-    element.whatsapp = !element.whatsapp;
-    let itemIndex = this.checked.findIndex(x => x.element.id == element.id);
-    if (itemIndex !== -1) {
-      this.checked.splice(itemIndex, 1);
-    }
-    else {
-      this.checked.push({element, arrayID, combinedIndex});
-    }
+  clickEvent(type, wholeItem, arrayID, symptomID) {
+    let thisObj = type == "Symptom" ? wholeItem.combined[0] : wholeItem
+    thisObj.whatsapp = !thisObj.whatsapp;
+    let itemIndex = this.checked.findIndex(x => x.thisObj.id == thisObj.id);
+    itemIndex !== -1 ? this.checked.splice(itemIndex, 1) : this.checked.push({thisObj, arrayID, symptomID})
   }
 
   clearArray() {
-    this.checked.forEach(element => element.element.whatsapp = false);
+    this.checked.forEach(element => element.thisObj.whatsapp = false);
     this.checked.length = 0;
   }
 
   deleteArray() {
     this.checked.forEach(element => {
       if (element.arrayID == 4) {
-        let dynamicIndex = this.appointment.findIndex(x => x.id == element.element.id);
+        let dynamicIndex = this.appointment.findIndex(x => x.id == element.thisObj.id);
         this.appointment.splice(dynamicIndex, 1);
       } else {
         let thisArray = this.getArray(element.arrayID);
-        let dynamicCombinedIndex = thisArray.findIndex(x => x.symptom.id == element.combinedIndex);
+        let dynamicCombinedIndex = thisArray.findIndex(x => x.symptom.id == element.symptomID);
         let arrayIndex = thisArray[dynamicCombinedIndex].combined.findIndex(y => y.id == element.id);
         thisArray[dynamicCombinedIndex].combined.splice(arrayIndex, 1);
         thisArray[dynamicCombinedIndex].combined.length == 0 && thisArray.splice(dynamicCombinedIndex, 1);
@@ -117,14 +112,14 @@ export class TemplateService {
     this.checked.length = 0;
   }
 
-  deleteIOS(thisItem, arrayID, mainID, combinedID) {
+  deleteIOS(arrayID, sypmtomIndex, actionIndex) {
     let thisArray = this.getArray(arrayID);
-    thisArray[mainID].combined.splice(combinedID, 1);
-    thisArray[mainID].combined.length === 0 && thisArray.splice(mainID, 1);
+    thisArray[sypmtomIndex].combined.splice(actionIndex, 1);
+    thisArray[sypmtomIndex].combined.length === 0 && thisArray.splice(sypmtomIndex, 1);
   }
   
-  deleteIOSAppointment(thisItem) {
-    this.appointment.splice(this.appointment.findIndex(x => x.id == thisItem.id), 1);
+  deleteIOSAppointment(apptIndex) {
+    this.appointment.splice(apptIndex, 1);
   }
   // getArray(id) { //return array type
   //   return [this.criticalArray, this.warningArray, this.goodArray][id];
@@ -163,7 +158,7 @@ export class TemplateService {
   settingAction = [];
 
   setGlobalSettings() {
-    let promises = [this.settingStorage.getType("Symptom"), this.settingStorage.getType("Action")];
+    let promises = [this.settingService.getType("Symptom"), this.settingService.getType("Action")];
     Promise.all(promises).then(data => {
       this.settingSymptom = data[0];
       this.settingAction = data[1];
@@ -215,11 +210,11 @@ export class TemplateService {
     this.goodArray = val.find(x => x.id == templateID).templates[2];
     [this.criticalArray, this.warningArray, this.goodArray].forEach(eachArray => {
       eachArray.forEach(element => {
-        this.settingStorage.getOneImage("Symptom", element.symptom.symptomID).then(oneImg => {
+        this.settingService.getOneImage("Symptom", element.symptom.symptomID).then(oneImg => {
           element.symptom.img = oneImg;
         });
         element.combined.forEach(oneCombined => {
-          this.settingStorage.getOneImage("Action", oneCombined.actionID).then(actionImg => {
+          this.settingService.getOneImage("Action", oneCombined.actionID).then(actionImg => {
             oneCombined.img = actionImg;
           })
         })
@@ -237,6 +232,7 @@ export class TemplateService {
   backUpAppointment = [];
 
   callEdit(defaultLanguage) {
+    console.warn("default lang", defaultLanguage);
     this.backUpCriticalArray = JSON.parse(JSON.stringify(this.criticalArray)); //need to deep copy to remove reference
     this.backUpWarningArray = JSON.parse(JSON.stringify(this.warningArray));
     this.backUpGoodArray = JSON.parse(JSON.stringify(this.goodArray));
@@ -255,6 +251,21 @@ export class TemplateService {
             actionID: ""
           }
           array.combined.push(newAction);
+        }
+        else {
+          this.settingService.getOneSetting("Symptom", array.symptom.symptomID).then(thisSymptom => {
+            array.symptom.text = this.returnLanguage(thisSymptom, defaultLanguage);
+          })
+          array.combined.forEach(action => {
+            if (action.actionID) {
+              this.settingService.getOneSetting("Action", action.actionID).then(thisAction => {
+                action.text = this.returnLanguage(thisAction, defaultLanguage);
+              })
+            }
+            else {
+              action.text = this.globalAction[defaultLanguage];
+            }
+          });
         }
       });
     })

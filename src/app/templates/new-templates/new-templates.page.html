@@ -182,14 +182,18 @@ ion-content{
     margin-inline-end: 0px;
     -webkit-margin-end: 0px;
   }
+
   .colIOS {
-    padding-inline-start: 0px; /* default is 5px*/
+    padding-inline-start: 0px;
+    /* default is 5px*/
     padding-inline-end: 16px;
   }
+
   .sc-ion-card-ios-h {
     margin-top: 12px;
     margin-bottom: 12px;
   }
+
   .labelAlign {
     padding-left: 32px;
   }
@@ -208,7 +212,8 @@ ion-content{
           <ion-item *ngFor="let thisLanguage of globalLanguage; let i = index" [lines]="i == 3 ? 'none' : 'full'"
             [ngStyle]="thisLanguage[0] == defaultLanguage && {'font-weight': 'bold'}" button detail="false">
             <ion-label class="labelAlign">{{thisLanguage[1]}}</ion-label>
-            <ion-radio [style.margin-right]="android ? '8px' : '12px'" [value]="thisLanguage[0]" color="originalPrimary" mode="md"></ion-radio>
+            <ion-radio [style.margin-right]="android ? '8px' : '12px'" [value]="thisLanguage[0]" color="originalPrimary"
+              mode="md"></ion-radio>
             <ion-ripple-effect></ion-ripple-effect>
           </ion-item>
         </ion-radio-group>
@@ -264,52 +269,57 @@ ion-content{
 
 
       <!-- <div> -->
-      <ion-list style="background-color: #d3d3d3" *ngIf="!viewPage || editPage" #mylist [ngClass]="globalItem.toggle ? 'addPaddingTopBottom' : 'removePaddingTopBottom'">
+      <ion-list style="background-color: #d3d3d3" *ngIf="!viewPage || editPage" #mylist
+        [ngClass]="globalItem.toggle ? 'addPaddingTopBottom' : 'removePaddingTopBottom'">
         <!--https://forum.ionicframework.com/t/fab-button-backdrop/80019-->
-        <ion-row *ngFor="let item of getArray(globalItem.id); let i = index; let last = last" [style.border-bottom]="!last && '2px solid #A9A9A9'"
-          [ngClass]="{'blur': globalItem.toggle}">
+        <ion-row *ngFor="let item of getArray(globalItem.id); let symptomIndex = index; let last = last"
+          [style.border-bottom]="!last && '2px solid #A9A9A9'" [ngClass]="{'blur': globalItem.toggle}">
           <!-- first column aka symptom -->
           <ion-col [size]="checked.length > 0 ? 5.25 : 6"
             [ngClass]="{'highlight': item.combined[0]?.whatsapp && checked.length > 0}"
             (press)="pressEvent('Symptom', item, globalItem.id, item.symptom.id);"
             (click)="checked.length > 0 && clickEvent('Symptom', item, globalItem.id, item.symptom.id)">
 
-            <ion-card (click)="checked.length == 0 && presentActionSheet('Symptom', item, globalItem.id)" class="removeCardMargin"
-            [ngClass]="{'highlight': item.combined[0]?.whatsapp && checked.length > 0, 'ion-activatable': checked.length == 0, 'cardIOS': !android}">
-              <ion-ripple-effect *ngIf="checked.length == 0"></ion-ripple-effect> 
-                <ion-row>
-                  <ion-col no-padding size="5.25" align-self-center>
-                    <img class="imgCircle" [src]="item.symptom.img || 'assets/empty.svg'"/>
-                  </ion-col>
-                  <ion-col no-padding size="6.75" align-self-center>
-                    <p class="imgCircleText"> {{item.symptom.text}} </p>
-                  </ion-col>
-                </ion-row>
-              </ion-card>
+            <ion-card (click)="checked.length == 0 && presentActionSheet('Symptom', item, globalItem.id)"
+              class="removeCardMargin"
+              [ngClass]="{'highlight': item.combined[0]?.whatsapp && checked.length > 0, 'ion-activatable': checked.length == 0, 'cardIOS': !android}">
+              <ion-ripple-effect *ngIf="checked.length == 0"></ion-ripple-effect>
+              <ion-row>
+                <ion-col no-padding size="5.25" align-self-center>
+                  <img class="imgCircle" [src]="item.symptom.img || 'assets/empty.svg'" />
+                </ion-col>
+                <ion-col no-padding size="6.75" align-self-center>
+                  <p class="imgCircleText"> {{item.symptom.text}} </p>
+                </ion-col>
+              </ion-row>
+            </ion-card>
             <ion-card [class.cardIOS]="!android" class="removeCardMargin">
               <ion-textarea rows="4" placeholder="Describe the symptom in more details."
                 [readonly]="item.combined[0]?.whatsapp" [(ngModel)]="item.symptom.description"
-                [ngClass]="{'highlight': item.combined[0]?.whatsapp && checked.length > 0}" (ionFocus)="!android && inputFocus()">
+                [ngClass]="{'highlight': item.combined[0]?.whatsapp && checked.length > 0}"
+                (ionFocus)="!android && inputFocus()">
               </ion-textarea>
             </ion-card>
           </ion-col>
 
-          <!-- for each second column aka action -->
-          <ng-container *ngFor="let x of item.combined; let actIndex = index;">
+
+          <ng-container *ngFor="let x of item.combined; let actionIndex = index;"> <!-- for each second column aka action -->
 
             <ion-col [size]="checked.length > 0 ? 5.25 : 6" [ngClass]="{'highlight': x.whatsapp && checked.length > 0}"
-              (press)="pressEvent('Action', x, globalItem.id, i, item.symptom.id)"
-              (click)="checked.length > 0 && clickEvent('Action', x, globalItem.id, item.symptom.id)" *ngIf="actIndex != 0">
+              (press)="pressEvent('Action', x, globalItem.id, item.symptom.id)"
+              (click)="checked.length > 0 && clickEvent('Action', x, globalItem.id, item.symptom.id)"
+              *ngIf="actionIndex != 0">
             </ion-col>
 
             <ion-col [size]="checked.length > 0 ? 5.25 : 6" [ngClass]="{'highlight': x.whatsapp && checked.length > 0}"
-              (press)="actIndex == 0 ? pressEvent('Symptom', item, globalItem.id, item.symptom.id) : pressEvent('Action', x, globalItem.id, item.symptom.id);"
-              (click)="checked.length > 0 && clickEvent('Action', x, globalItem.id, item.symptom.id)" style="display:flex;">
+              (press)="actionIndex == 0 ? pressEvent('Symptom', item, globalItem.id, item.symptom.id) : pressEvent('Action', x, globalItem.id, item.symptom.id);"
+              (click)="checked.length > 0 && clickEvent('Action', x, globalItem.id, item.symptom.id)">
 
-              <ion-item-sliding (ionSwipe)="checked.length == 0 && deleteIOS(x, globalItem.id, i, actIndex)" (ionDrag)="checked.length > 0 && dragAndCheckLongPress(slidingItem)" #slidingItem> 
-                <ion-item appShadowCss [customCSS]="[x.whatsapp, 'newTemplate']">
-                  <ion-card class="removeCardMargin" (click)="checked.length == 0 && presentActionSheet('Action', x)" 
-                  [ngClass]="{'highlight': x.whatsapp && checked.length > 0, 'cardIOS': !android, 'ion-activatable': checked.length == 0}">
+              <ion-item-sliding (ionSwipe)="checked.length == 0 && deleteIOS(globalItem.id, symptomIndex, actionIndex)"
+                                (ionDrag)="checked.length > 0 && dragAndCheckLongPress(slidingItem)" #slidingItem> <!-- swiping functionality -->
+                <ion-item appShadowCss [customCSS]="[x.whatsapp, 'newTemplate']"> <!-- appShadowCss [customCss] = custom directive to override shadow dom of ion-item -->
+                  <ion-card class="removeCardMargin" (click)="checked.length == 0 && presentActionSheet('Action', x)"
+                    [ngClass]="{'highlight': x.whatsapp && checked.length > 0, 'cardIOS': !android, 'ion-activatable': checked.length == 0}">
                     <ion-row>
                       <ion-col no-padding size="5.25" align-self-center>
                         <img class="imgCircle" [src]="x.img || 'assets/empty.svg'" />
@@ -321,23 +331,24 @@ ion-content{
                     <ion-ripple-effect *ngIf="checked.length == 0"></ion-ripple-effect>
                   </ion-card>
                   <ion-card [class.cardIOS]="!android" class="removeCardMargin">
-                    <ion-textarea rows="4" placeholder="Describe the action to take in your own words." [readonly]="checked.length > 0"
-                      [ngClass]="{'highlight': x.whatsapp && checked.length > 0}" [(ngModel)]="x.description" (ionFocus)="!android && inputFocus()">
+                    <ion-textarea rows="4" placeholder="Describe the action to take in your own words."
+                      [readonly]="checked.length > 0" [ngClass]="{'highlight': x.whatsapp && checked.length > 0}"
+                      [(ngModel)]="x.description" (ionFocus)="!android && inputFocus()"> <!-- ionFocus to prevent trigger long press bug for IOS when tap input-->
                     </ion-textarea>
                   </ion-card>
                 </ion-item>
                 <ion-item-options side="end" [ngStyle]="{'padding-bottom': android ? '8px' : '16px', 'padding-top': '8px'}">
-                  <ion-item-option color="danger" expandable (click)="checked.length == 0 && deleteIOS(x, globalItem.id, i, actIndex)">
+                  <ion-item-option color="danger" expandable (click)="checked.length == 0 && deleteIOS(globalItem.id, symptomIndex, actionIndex)">
                     <ion-icon name="trash" slot="top" style="zoom:2.0"></ion-icon> DELETE
-                  </ion-item-option>
+                  </ion-item-option> <!-- swipe to reveal DELETE button -->
                 </ion-item-options>
-                </ion-item-sliding>
+              </ion-item-sliding>
 
             </ion-col>
 
-            <ion-col size="1.5" *ngIf="checked.length > 0" [ngClass]="{'highlight': x.whatsapp}" style="display:flex;align-items:center;"
+            <ion-col size="1.5" *ngIf="checked.length > 0" [ngClass]="{'highlight': x.whatsapp}" style="display: flex; align-items: center;" 
               (click)="clickEvent('Action', x, globalItem.id, item.symptom.id)">
-              <ion-checkbox [checked]="x.whatsapp" mode="ios" color="success"></ion-checkbox>
+              <ion-checkbox [checked]="x.whatsapp" mode="ios" color="success"></ion-checkbox> <!-- checkbox for long press -->
             </ion-col>
 
           </ng-container>
@@ -351,7 +362,8 @@ ion-content{
 
         <ng-container *ngIf="globalItem.toggle">
           <!--https://stackoverflow.com/questions/28975673/how-to-blurcss-div-without-blur-child-element/29249483-->
-          <ion-row (click)="globalItem.toggle=!globalItem.toggle; addNewCriticalArray(globalItem.type, globalItem.id)" [style.position]="'relative'" class="ion-activatable">
+          <ion-row (click)="globalItem.toggle=!globalItem.toggle; addNewCriticalArray(globalItem.type, globalItem.id)"
+            [style.position]="'relative'" class="ion-activatable">
             <ion-col size="4">
               <ion-fab-button [color]="globalItem.colorBtn" style="float:right">
                 <ion-icon name="add"></ion-icon>
@@ -364,9 +376,10 @@ ion-content{
             </ion-col>
             <ion-ripple-effect></ion-ripple-effect>
           </ion-row>
-  
+
           <ion-row *ngIf="checkType(globalItem.id)"
-            (click)="globalItem.toggle=!globalItem.toggle; popUp(globalItem.id);" [style.position]="'relative'" class="ion-activatable">
+            (click)="globalItem.toggle=!globalItem.toggle; popUp(globalItem.id);" [style.position]="'relative'"
+            class="ion-activatable">
             <ion-col size="4">
               <ion-fab-button [color]="globalItem.colorBtn" style="float:right">
                 <ion-icon name="add"></ion-icon>
@@ -388,22 +401,23 @@ ion-content{
 
         <ion-row *ngFor="let item of getArray(globalItem.id)">
 
-          <ion-col size="6" style="display: flex">
+          <ion-col size="6">
             <ion-row>
               <ion-col no-padding size="5.25" align-self-center>
                 <img class="imgCircle" [src]="item.symptom.img || 'assets/empty.svg'" />
               </ion-col>
               <ion-col no-padding size="6.75" align-self-center>
-                <p class="imgCircleText"> {{item.symptom.description == "" ? item.symptom.text : item.symptom.description}} </p>
+                <p class="imgCircleText">
+                  {{item.symptom.description == "" ? item.symptom.text : item.symptom.description}} </p>
               </ion-col>
             </ion-row>
           </ion-col>
 
           <ion-col size="6" *ngIf="item.combined.length == 0" style="border-left: 2.5px solid #d3d3d3"></ion-col>
 
-          <ng-container *ngFor="let x of item.combined; let actIndex = index;">
-            <ion-col size="6" *ngIf="actIndex != 0"></ion-col>
-            <ion-col size="6" style="border-left: 2.5px solid #d3d3d3; display:flex;">
+          <ng-container *ngFor="let x of item.combined; let actionIndex = index;">
+            <ion-col size="6" *ngIf="actionIndex != 0"></ion-col>
+            <ion-col size="6" style="border-left: 2.5px solid #d3d3d3;">
               <ion-row>
                 <ion-col no-padding size="5.25" align-self-center>
                   <img class="imgCircle" [src]="x.img || 'assets/empty.svg'" />

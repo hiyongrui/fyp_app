@@ -140,7 +140,6 @@ export class SymptomActionPage implements OnInit {
   
   @ViewChild('content')content;
   scrollToItem() {
-    console.warn("clicked scroll");
     this.content.scrollToTop(1000);
     setTimeout(() => {
       this.buttonShown = false;

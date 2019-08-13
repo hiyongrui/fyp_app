@@ -4,7 +4,7 @@ import { Setting, SettingAction } from '../models/symptomaction';
 
 import {v4 as uuid} from 'uuid';
 
-const STORAGE_KEY = "settingStorageKey";
+const SYMPTOM_KEY = "symptomKey";
 const ACTION_KEY = "actionKey";
 
 @Injectable({
@@ -17,7 +17,7 @@ export class SymptomActionService {
   constructor(private storage: Storage) { }
 
   getType(type) {
-    this.thisKey = type == "Symptom" ? STORAGE_KEY : ACTION_KEY
+    this.thisKey = type == "Symptom" ? SYMPTOM_KEY : ACTION_KEY
     return this.storage.get(this.thisKey);
   }
   

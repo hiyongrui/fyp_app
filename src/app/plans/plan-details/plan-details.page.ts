@@ -68,6 +68,7 @@ export class PlanDetailsPage implements OnInit {
     this.PlanService.addPlanDetails(this.defaultLanguage, date1, this.planName, this.thisgroup.controls.detailname.value.trim(), this.thisgroup.controls.detailnric.value,
       this.thisgroup.controls.detailtcs.value.trim(), this.thisgroup.controls.detailcontact.value, maparr, this.appointment).then(() => {
         this.templateService.resetArray();
+        this.planService.resetExtras();
         this.router.navigateByUrl('/tabs/plans');
         this.templateService.presentToastWithOptions("Created plan!")
       });
@@ -122,16 +123,16 @@ export class PlanDetailsPage implements OnInit {
 
   @ViewChild('mylist') mylist: IonList;
 
-  pressEvent(type, thisObject, arrayID, combinedIndex) {
+  pressEvent(type, thisObject, arrayID, symptomID) {
     this.mylist.closeSlidingItems();
     this.apptList.closeSlidingItems();
     !this.android ?
-      this.inputTriggered ? this.inputTriggered = false : this.templateService.pressEvent(type, thisObject, arrayID, combinedIndex)
-      : this.templateService.pressEvent(type, thisObject, arrayID, combinedIndex)
+      this.inputTriggered ? this.inputTriggered = false : this.templateService.pressEvent(type, thisObject, arrayID, symptomID)
+      : this.templateService.pressEvent(type, thisObject, arrayID, symptomID)
   }
 
-  clickEvent(type, wholeItem, arrayID, combinedIndex) {
-    this.templateService.clickEvent(type, wholeItem, arrayID, combinedIndex);
+  clickEvent(type, wholeItem, arrayID, symptomID) {
+    this.templateService.clickEvent(type, wholeItem, arrayID, symptomID);
   }
 
   clearArray() {
@@ -157,14 +158,14 @@ export class PlanDetailsPage implements OnInit {
   }
 
   @ViewChild('apptList') apptList: IonList;
-  deleteIOSAppointment(item) {
-    this.templateService.deleteIOSAppointment(item);
+  deleteIOSAppointment(apptIndex) {
+    this.templateService.deleteIOSAppointment(apptIndex);
     this.apptList.closeSlidingItems();
     this.templateService.presentToastWithOptions("Deleted appointment!");
   }
 
-  deleteIOS(thisItem, arrayID, mainID, combinedID) {
-    this.templateService.deleteIOS(thisItem, arrayID, mainID, combinedID);
+  deleteIOS(arrayID, symptomIndex, actionIndex) {
+    this.templateService.deleteIOS(arrayID, symptomIndex, actionIndex);
     this.mylist.closeSlidingItems();
     this.templateService.presentToastWithOptions("Deleted action!");
   }

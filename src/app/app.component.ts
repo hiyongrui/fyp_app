@@ -89,8 +89,7 @@ export class AppComponent {
       //https://cordova.apache.org/docs/en/latest/reference/cordova-plugin-splashscreen/#preferences
       this.storage.length().then(length => {
         length == 0 && (
-          this.storage.set("settingStorageKey", this.globalSettingObj), this.storage.set("actionKey", this.globalActionObj),
-          this.storage.set("plan", this.globalPlanObj)
+          this.storage.set("symptomKey", this.globalSettingObj), this.storage.set("actionKey", this.globalActionObj), this.storage.set("planKey", this.globalPlanObj)
         );
       })
     });

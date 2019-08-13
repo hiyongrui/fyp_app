@@ -58,7 +58,8 @@ export class NewPlanPage implements OnInit {
 
   ionViewWillEnter() {
     let obj = this.planService.getExtras("extras");
-    obj && (this.slideOneForm.controls.firstName.setValue(obj.name), this.defaultLanguage = obj.language);
+    obj ? (this.slideOneForm.controls.firstName.setValue(obj.name), this.defaultLanguage = obj.language)
+      : (this.slideOneForm.reset(), this.defaultLanguage = 0)
     this.android = this.templateService.checkPlatformAndroid();
   }
 

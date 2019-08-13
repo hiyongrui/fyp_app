@@ -3,7 +3,7 @@ import { Storage } from '@ionic/storage';
 import { v4 as uuid } from 'uuid';
 import { TemplateService } from './template.service';
 
-const key = "plan";
+const key = "planKey";
 
 @Injectable({
   providedIn: 'root'

@@ -50,18 +50,22 @@ export class NewTemplatesPage implements OnInit {
   inputFocus = () => this.inputTriggered = true;
 
   @ViewChild('mylist')mylist: IonList;
+
   android: boolean;
-  pressEvent(type, thisObject, arrayID, combinedIndex) {
+
+  pressEvent(type, thisObject, arrayID, symptomID) {
     this.mylist.closeSlidingItems();
     !this.android ?
-      this.inputTriggered ? this.inputTriggered = false : this.templateService.pressEvent(type, thisObject, arrayID, combinedIndex)
-      : this.templateService.pressEvent(type, thisObject, arrayID, combinedIndex)
+      this.inputTriggered ? this.inputTriggered = false : this.templateService.pressEvent(type, thisObject, arrayID, symptomID)
+      : this.templateService.pressEvent(type, thisObject, arrayID, symptomID)
   }
+
   dragAndCheckLongPress(slideItem: IonItemSliding) {
     slideItem.close();
   }
-  clickEvent(type, wholeItem, arrayID, combinedIndex) {
-    this.templateService.clickEvent(type, wholeItem, arrayID, combinedIndex);
+
+  clickEvent(type, wholeItem, arrayID, symptomID) {
+    this.templateService.clickEvent(type, wholeItem, arrayID, symptomID);
   }
 
   clearArray() {
@@ -73,8 +77,8 @@ export class NewTemplatesPage implements OnInit {
     this.templateService.presentToastWithOptions("Deleted items!");
   }
 
-  deleteIOS(thisItem, arrayID, mainID, combinedID) {
-    this.templateService.deleteIOS(thisItem, arrayID, mainID, combinedID);
+  deleteIOS(arrayID, symptomIndex, actionIndex) {
+    this.templateService.deleteIOS(arrayID, symptomIndex, actionIndex);
     this.mylist.closeSlidingItems();
     this.templateService.presentToastWithOptions("Deleted action!");
   }

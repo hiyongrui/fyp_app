@@ -45,7 +45,7 @@ export class ViewTemplatesPage implements OnInit {
   }
 
   loadTemplates() {
-    this.templateService.getAllTemplate("allKey").then(val => {
+    this.templateService.getAllTemplate("templateKey").then(val => {
       val = val || []; //prevent null if val empty at start no storage
       this.allTemplate = val.map((element, index) => {
         element.templates.forEach(x => {
@@ -63,13 +63,13 @@ export class ViewTemplatesPage implements OnInit {
         }
         return obj;
       });
-      this.allTemplate.sort((a,b) => a.language - b.language); //sort template by language English > Chinese > Malay > Tamil
       this.allTemplate.forEach(x => {
         x.template = x.template.filter(function(element) {
           // console.error(this);
           return !this.has(element.symptom.symptomID) && this.add(element.symptom.symptomID) // https://stackoverflow.com/questions/51517650/removing-duplicates-using-set-in-javascript
         }, new Set);  
       })
+      this.allTemplate.sort((a,b) => a.language - b.language); //sort template by language English > Chinese > Malay > Tamil
     });
   }
 
