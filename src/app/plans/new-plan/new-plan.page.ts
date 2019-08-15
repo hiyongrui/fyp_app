@@ -40,6 +40,7 @@ export class NewPlanPage implements OnInit {
       this.thisInput.setFocus();
       return false;
     }
+    this.planService.setExtras("extras", "fromNewPlan");
     this.router.navigateByUrl('/tabs/plans/details/' + this.defaultLanguage + '/' + planName.value.trim());
   }
 
@@ -66,7 +67,7 @@ export class NewPlanPage implements OnInit {
   ionViewDidEnter() {
     setTimeout(() => {
       this.thisInput.setFocus(); //does keyboard show up?
-    }, 10)
+    }, 100);
   }
   
   inputFocus() {

@@ -28,7 +28,7 @@ export class AppComponent {
                 "S4242789F", "S4602401Z", "S5097092B", "S1688952J", "S8918877F", "S4944132J", "S6659589G", "S5273909H", "S7256518E", "S2138435F",
                 "S4277286J", "S1968009F", "S9257797Z", "S9693677Z", "S9387804C", "S6885672H", "S9377561I", "S9660876D", "S3747930F", "S5981933Z",
                 "S5180294B", "S5024489Z", "S3926971F", "S1322990B", "S8562878Z", "S3351147G", "S9660052F", "S4550617G", "S2166511H", "S3636332J",
-                "S9976053B", "S2811635G", "S7711051H", "S8719740I", "S0859994G", "S6260910I", "S2129378D", "S9702694G", "S3725048A", "S3042412C"]
+                "S9976053B", "S2811635G", "S7711051H", "S8719740I", "S0859994G", "S6260910I", "S2129378D", "S9702694G", "S3725048A", "S9842412C"]
   listOfPlanName = ["Bob Lee", "Ashley Ong", "Alvin Goh", "Cheryl Ng", "Marcus Choo", "Lucas Lim", "Kevin Tan", "Justin Phua", "Emma Lee", "Hazel Wong",
                     "Timothy Tan", "Ryan Lee", "Joshua Wong", "Joseph Lee", "Jayden Ong", "Ivan Goh", "Gordon Tay", "Max Lee", "Eugene Tan", "Adeline Yap", 
                     "Isabelle Ong", "Samuel Tan", "Fiona Goh", "Don Tan", "Desmond Tan", "Derrik Ong", "Darryl Ng", "Daniel Teo", "Caleb Koh", "Malcolom Chia", 

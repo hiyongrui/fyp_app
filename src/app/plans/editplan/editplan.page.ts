@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { PlanService } from './../../services/plan.service';
 import { TemplateService } from 'src/app/services/template.service';
 import { SymptomActionService } from 'src/app/services/symptomaction.service';
-import { LoadingController, IonList, IonItemSliding } from '@ionic/angular';
+import { LoadingController, IonList, IonItemSliding, AlertController } from '@ionic/angular';
 import * as jsPDF from 'jspdf';
 import domtoimage from 'dom-to-image';
 import { File } from '@ionic-native/file/ngx';
@@ -24,7 +24,7 @@ export class EditplanPage implements OnInit {
   android: boolean;
 
   constructor(private PlanService: PlanService, private activatedRoute: ActivatedRoute, private templateService: TemplateService, private settingService: SymptomActionService,
-    private router: Router, private file: File, private loadingController: LoadingController, private fileOpener: FileOpener, public formBuilder: FormBuilder) {
+    private router: Router, private file: File, private loadingController: LoadingController, private fileOpener: FileOpener, public formBuilder: FormBuilder, private alertCtrl: AlertController) {
   }
 
   something = this.formBuilder.group({
@@ -186,7 +186,25 @@ export class EditplanPage implements OnInit {
       this.file.writeFile(directory, fileName, buffer, { replace: true }).then(success => { //https://ourcodeworld.com/articles/read/38/how-to-capture-an-image-from-a-dom-element-with-javascript
         this.loading.dismiss();
         this.templateService.presentToastWithOptions("PDF file has been created!");
-        this.fileOpener.open(success.nativeURL, "application/pdf").catch(() => this.templateService.presentToastWithOptions("Please install a PDF Viewer such as Acrobat!"));
+        this.fileOpener.open(success.nativeURL, "application/pdf").catch(() => {
+          this.alertCtrl.create({
+            header: "No applications found to open PDF",
+            message: "Try searching Google Play Store for a PDF Viewer app, or do you want to install Adobe Acrobat PDF Viewer app?",
+            buttons: [
+              {
+                text: 'CANCEL',
+                role: 'cancel',
+                cssClass: 'cancelBlueBtn'
+              },
+              {
+                text: 'OK',
+                cssClass: 'okBlueBtn',
+                handler: () => window.open("https://play.google.com/store/apps/details?id=com.adobe.reader&hl=en", "_system")
+              }
+            ]
+          }).then(alert => alert.present())
+          this.templateService.presentToastWithOptions("Please install a PDF Viewer app such as Adobe Acrobat!")
+        });
       }).catch((error) => this.templateService.presentToastWithOptions("An error has occured!!!"));
     })
   }

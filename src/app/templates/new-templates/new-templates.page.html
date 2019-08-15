@@ -313,7 +313,7 @@ ion-content{
 
             <ion-col [size]="checked.length > 0 ? 5.25 : 6" [ngClass]="{'highlight': x.whatsapp && checked.length > 0}"
               (press)="actionIndex == 0 ? pressEvent('Symptom', item, globalItem.id, item.symptom.id) : pressEvent('Action', x, globalItem.id, item.symptom.id);"
-              (click)="checked.length > 0 && clickEvent('Action', x, globalItem.id, item.symptom.id)">
+              (click)="checked.length > 0 && clickEvent('Action', x, globalItem.id, item.symptom.id)" style="display: flex;">
 
               <ion-item-sliding (ionSwipe)="checked.length == 0 && deleteIOS(globalItem.id, symptomIndex, actionIndex)"
                                 (ionDrag)="checked.length > 0 && dragAndCheckLongPress(slidingItem)" #slidingItem> <!-- swiping functionality -->
@@ -401,7 +401,7 @@ ion-content{
 
         <ion-row *ngFor="let item of getArray(globalItem.id)">
 
-          <ion-col size="6">
+          <ion-col size="6" style="display: flex;">
             <ion-row>
               <ion-col no-padding size="5.25" align-self-center>
                 <img class="imgCircle" [src]="item.symptom.img || 'assets/empty.svg'" />
@@ -417,7 +417,7 @@ ion-content{
 
           <ng-container *ngFor="let x of item.combined; let actionIndex = index;">
             <ion-col size="6" *ngIf="actionIndex != 0"></ion-col>
-            <ion-col size="6" style="border-left: 2.5px solid #d3d3d3;">
+            <ion-col size="6" style="border-left: 2.5px solid #d3d3d3; display: flex;"> <!--flex needed to align action center when symptom textarea description too long-->
               <ion-row>
                 <ion-col no-padding size="5.25" align-self-center>
                   <img class="imgCircle" [src]="x.img || 'assets/empty.svg'" />

@@ -97,7 +97,14 @@ export class PlanDetailsPage implements OnInit {
     this.defaultLanguage = +this.activatedRoute.snapshot.paramMap.get("languageID");
     this.templateService.callEdit(this.defaultLanguage);
     this.templateService.setGlobalSettings();
-    this.thisInput.setFocus();
+  }
+
+  ionViewDidEnter() {
+    let obj = this.planService.getExtras("extras");
+    obj ? !this.thisgroup.controls.detailname.value && this.thisInput.setFocus()
+    : setTimeout(() => {
+       !this.thisgroup.controls.detailname.value && this.thisInput.setFocus();
+    }, 600)
   }
 
   goBackToNewPlan() {
