@@ -35,6 +35,11 @@
     --padding-start: 0px !important;
     --padding-end: 0px !important;
   } */
+  .imgCircle {
+    border-radius: 50%;
+    width: 100%;
+    padding:4%;
+  }
 </style>
 
 <ion-content padding-bottom>
@@ -69,7 +74,7 @@
                     <img class="imgCircle" [src]="x.symptom.img || 'assets/empty.svg'" />
                   </ion-col>
                   <ion-col no-padding size="6.75" align-self-center>
-                    <p class="imgCircleText"> {{x.symptom.text}} </p>
+                    <p style="margin-top: 0px; margin-bottom: 0px;"> {{x.symptom.text}} </p>
                   </ion-col>
                 </ion-row>
               </ion-col>

@@ -1,4 +1,4 @@
-import { SettingAction, Setting } from './models/symptomaction';
+import { Symptom, Action } from './models/symptomaction';
 import { Component } from '@angular/core';
 
 import { Platform } from '@ionic/angular';
@@ -6,6 +6,7 @@ import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { Storage } from '@ionic/storage';
 import {v4 as uuid} from 'uuid';
+import { TemplateService } from './services/template.service';
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html'
@@ -35,11 +36,14 @@ export class AppComponent {
                     "Asher Ong", "Alexendra Lee", "Debbie Goh", "Grace Liew", "Joyce Quek", "Lucy Wong", "Naomi Yap", "Rachel Ho", "Michelle Pang", "Nicole Lam",
                     "Olivia Tan", "Sarah Lee", "Sharon Ng", "Valerie Tan", "Jason Lim", "Esther Ng", "Brandon Loo", "Benjamin Lee", "Angelica Yap", "Ernest Wong"]
 
+  listOfCategory = this.templateService.globalCategory
+
   constructor(
     private platform: Platform,
     private splashScreen: SplashScreen,
     private statusBar: StatusBar,
-    private storage: Storage
+    private storage: Storage,
+    private templateService: TemplateService
   ) {
     // for(let i = 100; i--;) {
       // let globalPlanObj = {
@@ -89,13 +93,13 @@ export class AppComponent {
       //https://cordova.apache.org/docs/en/latest/reference/cordova-plugin-splashscreen/#preferences
       this.storage.length().then(length => {
         length == 0 && (
-          this.storage.set("symptomKey", this.globalSettingObj), this.storage.set("actionKey", this.globalActionObj), this.storage.set("planKey", this.globalPlanObj)
+          this.storage.set("symptomKey", this.globalSymptomObj), this.storage.set("actionKey", this.globalActionObj), this.storage.set("planKey", this.globalPlanObj), this.storage.set("categoryKey", this.listOfCategory)
         );
       })
     });
   }
 
-  globalSettingObj: Setting[] = [
+  globalSymptomObj: Symptom[] = [
     {
       id: uuid(),
       enName: "Fever",
@@ -103,6 +107,7 @@ export class AppComponent {
       myName: "demam",
       tmName: "காய்ச்சல்",
       icon: "assets/pdfcough.png",
+      categoryID: this.listOfCategory[0]
     },
     {
       id: uuid(),
@@ -110,7 +115,8 @@ export class AppComponent {
       chName: "呼吸急促",
       myName: "sesak nafas",
       tmName: "மூச்சு திணறல்",
-      icon: "assets/pdfnobreath.png"
+      icon: "assets/pdfnobreath.png",
+      categoryID: this.listOfCategory[1]
     },
     {
       id: uuid(),
@@ -118,7 +124,8 @@ export class AppComponent {
       chName: "身体状况良好",
       myName: "Keadaan kesihatan yang baik",
       tmName: "நல்ல உடல்நிலை",
-      icon: "assets/pdfgotbreath.png"
+      icon: "assets/pdfgotbreath.png",
+      categoryID: this.listOfCategory[2]
     },
     {
       id: uuid(),
@@ -126,7 +133,8 @@ export class AppComponent {
       chName: "咳嗽",
       myName: "batuk",
       tmName: "இருமல்",
-      icon: "assets/pdfredcough.png"
+      icon: "assets/pdfredcough.png",
+      categoryID: this.listOfCategory[3]
     },
     {
       id: uuid(),
@@ -134,11 +142,12 @@ export class AppComponent {
       chName: "高血压",
       myName: "tekanan darah tinggi",
       tmName: "உயர் இரத்த அழுத்தம்",
-      icon: "assets/pdfhighblood.png"
+      icon: "assets/pdfhighblood.png",
+      categoryID: this.listOfCategory[3]
     }
   ]
   
-  globalActionObj: SettingAction[] = [
+  globalActionObj: Action[] = [
     {
       id: uuid(),
       enName: "Call 995",
@@ -146,6 +155,7 @@ export class AppComponent {
       myName: "Panggil 995",
       tmName: "995 ஐ அழைக்கவும்",
       icon: "assets/pdfcall995.png",
+      categoryID: this.listOfCategory[0]
     },
     {
       id: uuid(),
@@ -153,7 +163,8 @@ export class AppComponent {
       chName: "继续定期服用中药",
       myName: "Teruskan ubat biasa",
       tmName: "வழக்கமான மருந்துகளைத் தொடரவும்",
-      icon: "assets/pdfcontinuemed.png"
+      icon: "assets/pdfcontinuemed.png",
+      categoryID: this.listOfCategory[1]
     },
     {
       id: uuid(),
@@ -161,7 +172,8 @@ export class AppComponent {
       chName: "保持通常的活动/运动水平",
       myName: "Mengekalkan aktiviti biasa/tahap senaman",
       tmName: "வழக்கமான நடவடிக்கைகள் / உடற்பயிற்சி நிலைகளை பராமரிக்கவும்",
-      icon: "assets/pdfmaintain.png"
+      icon: "assets/pdfmaintain.png",
+      categoryID: this.listOfCategory[2]
     },
     {
       id: uuid(),
@@ -169,7 +181,8 @@ export class AppComponent {
       chName: "使用救援吸入器",
       myName: "Gunakan inhaler penyelamat",
       tmName: "மீட்பு இன்ஹேலரைப் பயன்படுத்தவும்",
-      icon: "assets/pdfrescue.png"
+      icon: "assets/pdfrescue.png",
+      categoryID: this.listOfCategory[3]
     }
   ]
 

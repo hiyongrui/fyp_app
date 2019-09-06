@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { PlanService } from './../../services/plan.service';
 import { TemplateService } from 'src/app/services/template.service';
 import { SymptomActionService } from 'src/app/services/symptomaction.service';
-import { LoadingController, IonList, IonItemSliding, AlertController } from '@ionic/angular';
+import { LoadingController, IonList, IonItemSliding, AlertController, Events } from '@ionic/angular';
 import * as jsPDF from 'jspdf';
 import domtoimage from 'dom-to-image';
 import { File } from '@ionic-native/file/ngx';
@@ -24,7 +24,8 @@ export class EditplanPage implements OnInit {
   android: boolean;
 
   constructor(private PlanService: PlanService, private activatedRoute: ActivatedRoute, private templateService: TemplateService, private settingService: SymptomActionService,
-    private router: Router, private file: File, private loadingController: LoadingController, private fileOpener: FileOpener, public formBuilder: FormBuilder, private alertCtrl: AlertController) {
+    private router: Router, private file: File, private loadingController: LoadingController, private fileOpener: FileOpener, public formBuilder: FormBuilder, 
+    private alertCtrl: AlertController, private event: Events) {
   }
 
   something = this.formBuilder.group({
@@ -125,7 +126,7 @@ export class EditplanPage implements OnInit {
   }
 
   popOverController(x) {
-    let menuOptions = ["Edit", "Rename", "Export to PDF"];
+    let menuOptions = ["Edit", "Rename", "Duplicate", "Create Crisis Template", "Export to PDF"];
     this.templateService.popOverController('popover', x, menuOptions).then(popover => {
       popover.present();
       popover.onDidDismiss().then((data) => {
@@ -137,7 +138,9 @@ export class EditplanPage implements OnInit {
   callAction(type) { //https://ultimatecourses.com/blog/deprecating-the-switch-statement-for-object-literals
     var call = {
       'Edit': () => this.callEdit(),
-      'Rename': () => this.askForName(),
+      'Rename': () => this.askForName('rename'),
+      'Duplicate': () => this.askForName('duplicate'),
+      "Create Crisis Template": () => this.askForName("Create Crisis Template"),
       "Export to PDF": () => this.exportToPDF()
     };
     call[type]();
@@ -245,13 +248,30 @@ export class EditplanPage implements OnInit {
     })
   }
 
-  askForName() {
-    this.templateService.alertInput("Enter new name").then((alertData: string) => {
-      this.PlanService.renamePlan(this.details.id, alertData).then(() => {
-        this.details.planName = alertData;
-        this.templateService.presentToastWithOptions("Renamed plan!");
-      })
-    }).catch(() => {})
+  askForName(typeOfAction) {
+    let inputMsg = (typeOfAction == 'rename') ? 'Enter new name' : 
+      (typeOfAction == 'duplicate') ? 'Enter name of the duplicated plan' : 'Enter Crisis Template name'
+    if (typeOfAction == 'Create Crisis Template') {
+      this.router.navigate(["/tabs/templates/new"], {replaceUrl: true}).then(() => {
+        this.event.publish("createTemplateFromPlan", this.defaultLanguage, this.details.id);
+      });
+    }
+    else {
+      this.templateService.alertInput(inputMsg).then((alertData: string) => {
+        if (typeOfAction == 'rename') {
+          this.PlanService.renamePlan(this.details.id, alertData).then(() => {
+            this.details.planName = alertData;
+            this.templateService.presentToastWithOptions("Renamed plan!");
+          })
+        }
+        else if (typeOfAction == 'duplicate') {
+          this.PlanService.duplicatePlan(this.details.id, alertData).then(() => {
+            this.templateService.presentToastWithOptions("Duplicated plan!");
+            this.router.navigate(["/tabs/plans"], {replaceUrl: true});
+          })
+        }
+      }).catch(() => {})
+    }
   }
 
   dateChanged(my, appObj) {

@@ -193,6 +193,10 @@
   .label-stacked.sc-ion-label-ios-h {
     margin-bottom: 0px;
   }
+  p {
+    margin-top: 0px;
+    margin-bottom: 0px;
+  }
 </style>
 
 <!--ADD LONG PRESS https://forum.ionicframework.com/t/how-to-select-multiple-item-on-long-press/67456/2 -->
@@ -321,7 +325,8 @@
                 <img class="imgCircle" [src]="item.symptom.img || 'assets/empty.svg'" />
               </ion-col>
               <ion-col no-padding size="6.75" align-self-center>
-                <p class="imgCircleText"> {{item.symptom.description == "" ? item.symptom.text : item.symptom.description}}</p>
+                <p [class.boldText]="item.symptom.description"> {{item.symptom.text}} </p>
+                <p *ngIf="item.symptom.description"> {{item.symptom.description}} </p>
               </ion-col>
             </ion-row>
           </ion-col>
@@ -336,7 +341,8 @@
                   <img class="imgCircle" [src]="x.img || 'assets/empty.svg'" />
                 </ion-col>
                 <ion-col no-padding size="6.75" align-self-center>
-                  <p class="imgCircleText"> {{x.description == "" ? x.text : x.description}} </p>
+                  <p [class.boldText]="x.description"> {{x.text}} </p>
+                  <p *ngIf="x.description"> {{x.description}} </p>
                 </ion-col>
               </ion-row>
             </ion-col>
@@ -344,8 +350,8 @@
 
         </ion-row>
 
-        <ion-row style="height:45px;" [ngClass]="{'blur': globalItem.toggle}" *ngIf="!checkType(globalItem.id)">
-          <p text-center style="width:100%"> No symptoms and actions added </p>
+        <ion-row style="height:45px;" *ngIf="!checkType(globalItem.id)">
+          <p align-self-center text-center style="width:100%;"> No symptoms and actions added </p>
         </ion-row>
 
       </ion-list>
@@ -373,7 +379,7 @@
                   <img class="imgCircle" [src]="item.symptom.img || 'assets/empty.svg'" />
                 </ion-col>
                 <ion-col no-padding size="6.75" align-self-center>
-                  <p class="imgCircleText"> {{item.symptom.text}} </p>
+                  <p> {{item.symptom.text}} </p>
                 </ion-col>
               </ion-row>
             </ion-card>
@@ -410,7 +416,7 @@
                         <img class="imgCircle" [src]="x.img || 'assets/empty.svg'" />
                       </ion-col>
                       <ion-col no-padding size="6.75" align-self-center>
-                        <p class="imgCircleText"> {{x.text}} </p>
+                        <p> {{x.text}} </p>
                       </ion-col>
                     </ion-row>
                     <ion-ripple-effect *ngIf="checked.length == 0"></ion-ripple-effect>
@@ -589,7 +595,7 @@
         </ng-container>
 
         <ion-row style="height:45px;" *ngIf="isDisabled && !checkAppt()">
-          <p text-center style="width:100%"> No appointments added </p>
+          <p align-self-center text-center style="width:100%"> No appointments added </p>
         </ion-row>
 
 

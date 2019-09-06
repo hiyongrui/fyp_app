@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage';
-import { Setting, SettingAction } from '../models/symptomaction';
+import { Symptom, Action } from '../models/symptomaction';
 
 import {v4 as uuid} from 'uuid';
 
@@ -37,23 +37,25 @@ export class SymptomActionService {
 
   addReusable(type, item) {
     if (type == "Symptom") {
-      var settingObj: Setting = {
+      var settingObj: Symptom = {
         id: uuid(),
         enName: item.enName,
         chName: item.chName,
         myName: item.myName,
         tmName: item.tmName,
-        icon: item.icon
+        icon: item.icon,
+        categoryID: item.categoryID
       };
     }
     else {
-      var settingObj: SettingAction = {
+      var settingObj: Action = {
         id: uuid(),
         enName: item.enName,
         chName: item.chName,
         myName: item.myName,
         tmName: item.tmName,
-        icon: item.icon
+        icon: item.icon,
+        categoryID: item.categoryID
       }
     }
     return this.getType(type).then(result => {
@@ -68,14 +70,14 @@ export class SymptomActionService {
   }
 
   getOneSetting(type, id) {
-    return this.getType(type).then((items: Setting[]) => {
+    return this.getType(type).then((items: Symptom[]) => {
       // console.error("items = " + JSON.stringify(items, null, 2));
       return items.find(item => item.id == id) //previously used filter returns array need [0] to access in editSettings page
     })
   }
 
   updateOneSetting(type, newValues) {
-    return this.getType(type).then((items: Setting[]) => {
+    return this.getType(type).then((items: Symptom[]) => {
       let itemIndex = items.findIndex(item => item.id === newValues.id);
       items[itemIndex] = newValues;
       return this.storage.set(this.thisKey, items);
@@ -83,7 +85,7 @@ export class SymptomActionService {
   }
   
   deleteSetting(type, checkedArray) {
-    return this.getType(type).then((items: Setting[]) => {
+    return this.getType(type).then((items: Symptom[]) => {
       checkedArray.forEach(element => {
         items.splice(items.findIndex(item => item.id === element.id), 1);
       });
@@ -92,14 +94,14 @@ export class SymptomActionService {
   }
   
   deleteIOS(type, thisItem) {
-    return this.getType(type).then((items: Setting[]) => {
+    return this.getType(type).then((items: Symptom[]) => {
       items.splice(items.findIndex(item => item.id === thisItem.id), 1);
       return this.storage.set(this.thisKey, items);
     })
   }
 
   getOneImage(type, id) {
-    return this.getType(type).then((items: Setting[]) => {
+    return this.getType(type).then((items: Symptom[]) => {
       let img = items.find(item => item.id === id).icon;
       return img;
     })

@@ -1,7 +1,7 @@
 import { Injectable, NgZone } from '@angular/core';
 import { Storage } from '@ionic/storage';
 import {v4 as uuid} from 'uuid';
-import { Setting } from '../models/symptomaction';
+import { Symptom } from '../models/symptomaction';
 import { SymptomActionService } from './symptomaction.service';
 import { ActionSheetController, ToastController, AlertController, PopoverController, ModalController, Platform } from '@ionic/angular';
 import { TemplatePopComponent } from './../templates/template-pop/template-pop.component';
@@ -154,7 +154,7 @@ export class TemplateService {
     }
   ]
 
-  settingSymptom:Setting[] = [];
+  settingSymptom:Symptom[] = [];
   settingAction = [];
 
   setGlobalSettings() {
@@ -168,6 +168,7 @@ export class TemplateService {
   globalLanguage = [[0, "English"], [1, "中文"], [2, "Malay"], [3, "Tamil"]];
   globalSymptom = ["Symptom", "症状", "gejala", "அறிகுறி"];
   globalAction = ["Action", "行动", "tindakan", "நடவடிக்கை"];
+  globalCategory = ["Diabetes", "Blood Pressure", "Flu test length ellipsis if too long text", "Fever"]
 
   selectRadio(defaultLanguage) {
     let completedArray = this.getAllArray();
@@ -232,7 +233,6 @@ export class TemplateService {
   backUpAppointment = [];
 
   callEdit(defaultLanguage) {
-    console.warn("default lang", defaultLanguage);
     this.backUpCriticalArray = JSON.parse(JSON.stringify(this.criticalArray)); //need to deep copy to remove reference
     this.backUpWarningArray = JSON.parse(JSON.stringify(this.warningArray));
     this.backUpGoodArray = JSON.parse(JSON.stringify(this.goodArray));
@@ -326,13 +326,22 @@ export class TemplateService {
   }
 
   //https://stackoverflow.com/questions/48133216/custom-icons-on-ionic-select-with-actionsheet-interface-ionic2
-   presentActionSheet(symptomOrAction, item, defaultLanguage) { //https://ionicframework.com/docs/api/action-sheet
-    symptomOrAction = symptomOrAction == "updateAction" ? "Action" : symptomOrAction
-    if (this.checkSymptomOrActionEmpty(symptomOrAction)) {
-      return false;
-    }
-    let typeToCall = symptomOrAction == 'Symptom' ? this.settingSymptom: this.settingAction;
-    this.popOverController('modal', '', typeToCall, defaultLanguage, symptomOrAction).then(callModal => {
+  presentActionSheet(symptomOrAction, item, defaultLanguage) { //https://ionicframework.com/docs/api/action-sheet
+    this.popOverController('modal', '', this.globalCategory, '', "Category").then(callModal => {
+      callModal.present();
+      callModal.onDidDismiss().then(data => {
+        if (!data.data) return false;
+        symptomOrAction = symptomOrAction == "updateAction" ? "Action" : symptomOrAction
+        let typeToCall = symptomOrAction == 'Symptom' ? this.settingSymptom: this.settingAction;
+        let filteredSymptomOrAction = typeToCall.filter(x => x.categoryID == data.data);
+        if (this.checkSymptomOrActionEmpty(symptomOrAction, filteredSymptomOrAction)) return false;
+        this.presentSymptomActionModal(symptomOrAction, item, defaultLanguage, filteredSymptomOrAction);
+      })
+    })
+  }
+
+  presentSymptomActionModal(symptomOrAction, item, defaultLanguage, filteredSymptomOrAction) {
+    this.popOverController('modal', '', filteredSymptomOrAction, defaultLanguage, symptomOrAction).then(callModal => {
       callModal.present();
       callModal.onDidDismiss().then(data => {
         if (!data.data) return false;
@@ -365,7 +374,7 @@ export class TemplateService {
   createButtons(itemToUpdate, type, defaultLanguage) {
     let buttons = [];
     let typeToCall = type == "Symptom" ? this.settingSymptom : this.settingAction
-    typeToCall.forEach((element: Setting, index) => {
+    typeToCall.forEach((element: Symptom, index) => {
       let style = document.createElement('style'); //https://github.com/ionic-team/ionic/issues/6589
       style.type = "text/css";
       style.innerHTML = ".customCSSClass" + index + '{background: url('+ "'" + element.icon + "'" + ') no-repeat !important; padding: 40px 20% 40px 25% !important; margin-top:25px !important; background-size:80px 80px !important; margin-left: 30px !important;}';
@@ -548,8 +557,7 @@ export class TemplateService {
     return returnValue;
   }
 
-  checkSymptomOrActionEmpty(type) {
-    let thisList = type == "Action" ? this.settingAction : this.settingSymptom;
+  checkSymptomOrActionEmpty(type, thisList) {
     thisList.length == 0 && this.presentToastWithOptions(`No ${type} found. Please add ${type} in settings!`);
     return thisList.length == 0
   }

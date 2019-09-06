@@ -112,7 +112,7 @@ export class PlanService {
 
   renamePlan(id,planName) {
     return this.getAllPlan().then(data => {
-      data.find(item => item.id ===id).planName = planName;
+      data.find(item => item.id === id).planName = planName;
       return this.storage.set(key, data);
     })
   }
@@ -129,4 +129,14 @@ export class PlanService {
     // sortedList.splice(sortedList.findIndex(x => x.id == id), 1);
     return this.storage.set(key, sortedList);
   }
+
+  duplicatePlan(id, planName) {
+    return this.getAllPlan().then(data => {
+      let itemFound = data.find(item => item.id === id);
+      let duplicatedItem = {...itemFound, id: uuid(), planName: planName}
+      data.unshift(duplicatedItem);
+      return this.storage.set(key, data);
+    })
+  }
+
 }

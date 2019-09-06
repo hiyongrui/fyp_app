@@ -4,8 +4,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/templates" *ngIf="viewPage && !editPage"></ion-back-button>
       <ion-button [routerLink]="['/tabs/templates']" *ngIf="!viewPage && !editPage"> Cancel </ion-button>
-      <ion-back-button defaultHref="/tabs/templates/new" (tap)="goToViewPageFromEdit()" *ngIf="editPage">
-      </ion-back-button>
+      <ion-back-button defaultHref="/tabs/templates/new" (tap)="goToViewPageFromEdit()" *ngIf="!viewPage && editPage"></ion-back-button>
     </ion-buttons>
 
     <ion-title [ngClass]="{'androidTitle': android && (viewPage || editPage)}">{{templateName}}
@@ -197,6 +196,10 @@ ion-content{
   .labelAlign {
     padding-left: 32px;
   }
+  p {
+    margin-top: 0px;
+    margin-bottom: 0px;
+  }
 </style>
 
 <ion-content padding id="pdf">
@@ -289,7 +292,7 @@ ion-content{
                   <img class="imgCircle" [src]="item.symptom.img || 'assets/empty.svg'" />
                 </ion-col>
                 <ion-col no-padding size="6.75" align-self-center>
-                  <p class="imgCircleText"> {{item.symptom.text}} </p>
+                  <p> {{item.symptom.text}} </p>
                 </ion-col>
               </ion-row>
             </ion-card>
@@ -325,7 +328,7 @@ ion-content{
                         <img class="imgCircle" [src]="x.img || 'assets/empty.svg'" />
                       </ion-col>
                       <ion-col no-padding size="6.75" align-self-center>
-                        <p class="imgCircleText"> {{x.text}} </p>
+                        <p> {{x.text}} </p>
                       </ion-col>
                     </ion-row>
                     <ion-ripple-effect *ngIf="checked.length == 0"></ion-ripple-effect>
@@ -407,8 +410,8 @@ ion-content{
                 <img class="imgCircle" [src]="item.symptom.img || 'assets/empty.svg'" />
               </ion-col>
               <ion-col no-padding size="6.75" align-self-center>
-                <p class="imgCircleText">
-                  {{item.symptom.description == "" ? item.symptom.text : item.symptom.description}} </p>
+                <p [class.boldText]="item.symptom.description"> {{item.symptom.text}} </p>
+                <p *ngIf="item.symptom.description"> {{item.symptom.description}} </p>
               </ion-col>
             </ion-row>
           </ion-col>
@@ -423,7 +426,8 @@ ion-content{
                   <img class="imgCircle" [src]="x.img || 'assets/empty.svg'" />
                 </ion-col>
                 <ion-col no-padding size="6.75" align-self-center>
-                  <p class="imgCircleText"> {{x.description == "" ? x.text : x.description}} </p>
+                  <p [class.boldText]="x.description"> {{x.text}} </p>
+                  <p *ngIf="x.description"> {{x.description}} </p>
                 </ion-col>
               </ion-row>
             </ion-col>
@@ -431,8 +435,8 @@ ion-content{
 
         </ion-row>
 
-        <ion-row style="height:45px;" [ngClass]="{'blur': globalItem.toggle}" *ngIf="!checkType(globalItem.id)">
-          <p text-center style="width:100%"> No symptoms and actions added </p>
+        <ion-row style="height:45px;" *ngIf="!checkType(globalItem.id)">
+          <p align-self-center text-center style="width:100%;"> No symptoms and actions added </p>
         </ion-row>
 
       </ion-grid>

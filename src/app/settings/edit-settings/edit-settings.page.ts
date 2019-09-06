@@ -1,4 +1,4 @@
-import { Setting } from '../../models/symptomaction';
+import { Symptom } from '../../models/symptomaction';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import { SymptomActionService } from 'src/app/services/symptomaction.service';
@@ -16,7 +16,7 @@ export class EditSettingsPage implements OnInit {
 
   editID: string;
   selectedTab: string;
-  contentDetails: Setting = {} as any; //or put contactDetails?.enName in the html page https://stackoverflow.com/questions/35074365/typescript-interface-default-values, else have error   
+  contentDetails: Symptom = {} as any; //or put contactDetails?.enName in the html page https://stackoverflow.com/questions/35074365/typescript-interface-default-values, else have error   
   //error typeError: cannot read property 'enName' of undefined, https://stackoverflow.com/questions/47498666/cannot-read-property-of-undefined-angular-4-typescript
 
   // thisForm = new FormGroup({ //https://angular.io/api/forms/FormControlName#use-with-ngmodel
@@ -40,6 +40,7 @@ export class EditSettingsPage implements OnInit {
     this.selectedTab = this.activatedRoute.snapshot.paramMap.get("selectedTab");  
     if (this.editID == "add") {
       this.contentDetails.enName = "New " + this.selectedTab;
+      this.contentDetails.categoryID = this.templateService.globalCategory[0];
     }
     else {
       this.settingService.getOneSetting(this.selectedTab, this.editID).then((obj) => {
@@ -77,13 +78,14 @@ export class EditSettingsPage implements OnInit {
       this.input.setFocus();
       return false;
     }
-    let newValues: Setting = {
+    let newValues: Symptom = {
       id: this.editID,
       enName: value.english.trim(),
       chName: value.chinese.trim(),
       myName: value.malay.trim(),
       tmName: value.tamil.trim(),
-      icon: this.contentDetails.icon
+      icon: this.contentDetails.icon,
+      categoryID: this.contentDetails.categoryID
     }
     this.editID == "add" ? 
       this.settingService.addReusable(this.selectedTab, newValues).then(() => {
@@ -157,4 +159,15 @@ export class EditSettingsPage implements OnInit {
     let x = this.thisForm.controls[item]
     return x.value ? true : false
   }
+
+  customPop() {
+    this.templateService.popOverController('modal', '', this.templateService.globalCategory, '', "Category").then(callModal => {
+      callModal.present();
+      callModal.onDidDismiss().then(data => {
+        if (!data.data) return false;
+        this.contentDetails.categoryID = data.data;
+      })
+    })
+  } 
+
 }

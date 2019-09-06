@@ -242,7 +242,7 @@
                   <img class="imgCircle" [src]="item.symptom.img || 'assets/empty.svg'" />
                 </ion-col>
                 <ion-col no-padding size="6.75" align-self-center>
-                  <p class="imgCircleText"> {{item.symptom.text}} </p>
+                  <p> {{item.symptom.text}} </p>
                 </ion-col>
               </ion-row>
             </ion-card>
@@ -280,7 +280,7 @@
                         <img class="imgCircle" [src]="x.img || 'assets/empty.svg'" />
                       </ion-col>
                       <ion-col no-padding size="6.75" align-self-center>
-                        <p class="imgCircleText"> {{x.text}} </p>
+                        <p> {{x.text}} </p>
                       </ion-col>
                     </ion-row>
                     <ion-ripple-effect *ngIf="checked.length == 0"></ion-ripple-effect>
