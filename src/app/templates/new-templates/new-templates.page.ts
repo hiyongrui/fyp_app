@@ -86,8 +86,8 @@ export class NewTemplatesPage implements OnInit {
   }
 
 //https://stackoverflow.com/questions/48133216/custom-icons-on-ionic-select-with-actionsheet-interface-ionic2
-  presentActionSheet(symptomOrAction, item) { //https://ionicframework.com/docs/api/action-sheet
-    this.templateService.presentActionSheet(symptomOrAction, item, this.defaultLanguage);
+  presentSymptomActionModal(symptomOrAction, item) { //https://ionicframework.com/docs/api/action-sheet
+    this.templateService.presentSymptomActionModal(symptomOrAction, item, this.defaultLanguage);
   }
 
   addNewCriticalArray(type, id) {
@@ -124,24 +124,26 @@ export class NewTemplatesPage implements OnInit {
     let templateName = (typeOfAction == "rename") ? "Enter new name" : 
       (typeOfAction == "duplicate") ? "Enter name of the duplicated template" :
       (typeOfAction == "Create Crisis Plan") ? "Enter Crisis Plan name" : "Enter template name"
-      this.templateService.alertInput(templateName).then((alertData: string) => {
+      this.templateService.alertInput(templateName).then(async (alertData: string) => {
+        let templateNameChecked = await this.templateService.checkDuplicateName('template', alertData);
         if (typeOfAction == "rename") {
-          this.templateService.renameTemplate(alertData, this.templateID).then(() => {
-            this.templateName = alertData;
+          this.templateService.renameTemplate(templateNameChecked, this.templateID).then(() => {
+            this.templateName = templateNameChecked;
             this.templateService.presentToastWithOptions("Renamed template!");
           });
         }
         else if (typeOfAction == "duplicate") {
-          this.templateService.duplicateTemplate(alertData, this.templateID).then(() => {
+          this.templateService.duplicateTemplate(templateNameChecked, this.templateID).then(() => {
             this.templateService.presentToastWithOptions("Duplicated template!");
             this.router.navigate(["/tabs/templates"], {replaceUrl: true});
           })
         }
         else if (typeOfAction == "Create Crisis Plan") {
-          this.router.navigateByUrl("/tabs/plans/details/" + this.defaultLanguage + "/" + alertData, {replaceUrl: true});
+          let planNameChecked = await this.templateService.checkDuplicateName('plan', alertData);
+          this.router.navigateByUrl("/tabs/plans/details/" + this.defaultLanguage + "/" + planNameChecked, {replaceUrl: true});
         }
         else {
-          this.addTemplate(alertData);
+          this.addTemplate(templateNameChecked);
         }
       }).catch(() => {})
   }
@@ -175,9 +177,9 @@ export class NewTemplatesPage implements OnInit {
   }
 
 
-  popOverController(x) { 
+  popOverController(event) {
     let menuOptions = ["Edit", "Rename", "Duplicate", "Create Crisis Plan", "Delete"];
-    this.templateService.popOverController('popover', x, menuOptions).then(popover => {
+    this.templateService.openPopover(menuOptions, event).then(popover => {
       popover.present();
       popover.onDidDismiss().then((data) => { //method 2 ngOnInIt inside onDidDismiss()
         data.data && this.callAction(data.data);
@@ -387,6 +389,7 @@ export class NewTemplatesPage implements OnInit {
   callEdit() {
     this.templateService.getOneTemplate(this.templateID).then(thisTemplate => {
       this.templateService.callEdit(thisTemplate.language);
+      this.viewPage = false;
       this.editPage = true;
     });
   }

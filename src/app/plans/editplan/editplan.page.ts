@@ -107,8 +107,8 @@ export class EditplanPage implements OnInit {
     this.templateService.clickEvent(type, wholeItem, arrayID, combinedIndex);
   }
 
-  presentActionSheet(symptomOrAction, item) { //https://ionicframework.com/docs/api/action-sheet
-    this.templateService.presentActionSheet(symptomOrAction, item, this.defaultLanguage);
+  presentSymptomActionModal(symptomOrAction, item) { //https://ionicframework.com/docs/api/action-sheet
+    this.templateService.presentSymptomActionModal(symptomOrAction, item, this.defaultLanguage);
   }
   addNewCriticalArray(type, id) {
     this.templateService.addNewCriticalArray(type, id, this.defaultLanguage);
@@ -125,9 +125,9 @@ export class EditplanPage implements OnInit {
     this.templateService.presentToastWithOptions("Deleted items!");
   }
 
-  popOverController(x) {
+  popOverController(event) {
     let menuOptions = ["Edit", "Rename", "Duplicate", "Create Crisis Template", "Export to PDF"];
-    this.templateService.popOverController('popover', x, menuOptions).then(popover => {
+    this.templateService.openPopover(menuOptions, event).then(popover => {
       popover.present();
       popover.onDidDismiss().then((data) => {
         data.data && this.callAction(data.data);
@@ -257,15 +257,16 @@ export class EditplanPage implements OnInit {
       });
     }
     else {
-      this.templateService.alertInput(inputMsg).then((alertData: string) => {
+      this.templateService.alertInput(inputMsg).then(async (alertData: string) => {
+        let planNameChecked = await this.templateService.checkDuplicateName('plan', alertData);
         if (typeOfAction == 'rename') {
-          this.PlanService.renamePlan(this.details.id, alertData).then(() => {
-            this.details.planName = alertData;
+          this.PlanService.renamePlan(this.details.id, planNameChecked).then(() => {
+            this.details.planName = planNameChecked;
             this.templateService.presentToastWithOptions("Renamed plan!");
           })
         }
         else if (typeOfAction == 'duplicate') {
-          this.PlanService.duplicatePlan(this.details.id, alertData).then(() => {
+          this.PlanService.duplicatePlan(this.details.id, planNameChecked).then(() => {
             this.templateService.presentToastWithOptions("Duplicated plan!");
             this.router.navigate(["/tabs/plans"], {replaceUrl: true});
           })

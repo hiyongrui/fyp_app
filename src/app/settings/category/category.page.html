@@ -1,0 +1,24 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Category</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/settings"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-virtual-scroll [items]="categoryList">
+
+    <ion-item *virtualItem="let item" lines="full" button detail (tap)="selectedCategory(item)">
+    
+      <ion-label text-wrap>
+        {{item}}
+      </ion-label>
+
+    </ion-item>
+
+  </ion-virtual-scroll>
+
+</ion-content>

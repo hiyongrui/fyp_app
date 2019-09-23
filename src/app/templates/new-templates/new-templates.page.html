@@ -283,7 +283,7 @@ ion-content{
             (press)="pressEvent('Symptom', item, globalItem.id, item.symptom.id);"
             (click)="checked.length > 0 && clickEvent('Symptom', item, globalItem.id, item.symptom.id)">
 
-            <ion-card (click)="checked.length == 0 && presentActionSheet('Symptom', item, globalItem.id)"
+            <ion-card (click)="checked.length == 0 && presentSymptomActionModal('Symptom', item, globalItem.id)"
               class="removeCardMargin"
               [ngClass]="{'highlight': item.combined[0]?.whatsapp && checked.length > 0, 'ion-activatable': checked.length == 0, 'cardIOS': !android}">
               <ion-ripple-effect *ngIf="checked.length == 0"></ion-ripple-effect>
@@ -321,7 +321,7 @@ ion-content{
               <ion-item-sliding (ionSwipe)="checked.length == 0 && deleteIOS(globalItem.id, symptomIndex, actionIndex)"
                                 (ionDrag)="checked.length > 0 && dragAndCheckLongPress(slidingItem)" #slidingItem> <!-- swiping functionality -->
                 <ion-item appShadowCss [customCSS]="[x.whatsapp, 'newTemplate']"> <!-- appShadowCss [customCss] = custom directive to override shadow dom of ion-item -->
-                  <ion-card class="removeCardMargin" (click)="checked.length == 0 && presentActionSheet('Action', x)"
+                  <ion-card class="removeCardMargin" (click)="checked.length == 0 && presentSymptomActionModal('Action', x)"
                     [ngClass]="{'highlight': x.whatsapp && checked.length > 0, 'cardIOS': !android, 'ion-activatable': checked.length == 0}">
                     <ion-row>
                       <ion-col no-padding size="5.25" align-self-center>

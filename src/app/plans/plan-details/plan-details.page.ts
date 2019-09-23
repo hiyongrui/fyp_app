@@ -152,8 +152,8 @@ export class PlanDetailsPage implements OnInit {
   }
 
   //https://stackoverflow.com/questions/48133216/custom-icons-on-ionic-select-with-actionsheet-interface-ionic2
-  presentActionSheet(symptomOrAction, item) { //https://ionicframework.com/docs/api/action-sheet
-    this.templateService.presentActionSheet(symptomOrAction, item, this.defaultLanguage);
+  presentSymptomActionModal(symptomOrAction, item) { //https://ionicframework.com/docs/api/action-sheet
+    this.templateService.presentSymptomActionModal(symptomOrAction, item, this.defaultLanguage);
   }
 
   addNewCriticalArray(type, id) {

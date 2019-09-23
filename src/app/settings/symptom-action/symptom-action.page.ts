@@ -18,6 +18,8 @@ export class SymptomActionPage implements OnInit {
 
   checked = []
   
+  eventCategory: string;
+
   @ViewChild('mylist')mylist: IonList;
 
   deleteIOS(thisItem) {
@@ -76,21 +78,26 @@ export class SymptomActionPage implements OnInit {
     this.checked.length = 0;
   }
 
-  constructor(private settingService: SymptomActionService, public event: Events, private router: Router, private templateService: TemplateService) {}
+  constructor(private settingService: SymptomActionService, private event: Events, private router: Router, private templateService: TemplateService) {
+    this.event.subscribe("category", category => {
+      this.eventCategory = category;
+      this.loadItems();
+    })
+  }
 
   ngOnInit() {
   }
 
   ionViewWillEnter() {
-    this.loadItems();
+    // this.loadItems();
     this.android = this.templateService.checkPlatformAndroid();
   }
 
   loadItems() {
     let allPromise = [this.settingService.getType("Symptom"), this.settingService.getType("Action")];
     Promise.all(allPromise).then(finalPromises => {
-      this.symptomList = finalPromises[0];
-      this.actionList = finalPromises[1];
+      this.symptomList = finalPromises[0].filter(x => x.categoryID == this.eventCategory);
+      this.actionList = finalPromises[1].filter(y => y.categoryID == this.eventCategory);
     })
   }
 

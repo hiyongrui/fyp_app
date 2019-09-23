@@ -228,3 +228,8 @@ ion-item.item-has-focus, ion-item.ion-touched{
 .boldText {
     font-weight: bold
 }
+
+.modal-wrapper.sc-ion-modal-ios {
+    height: 100%;
+    width: 100%;
+}

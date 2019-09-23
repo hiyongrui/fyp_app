@@ -1,0 +1,10 @@
+<ion-content>
+  <ion-list no-padding>
+    <ion-item *ngFor="let item of menuOptions; let last=last" (tap)="close(item)" [lines]="last ? 'none' : 'full'" button>
+      <ion-label text-wrap>
+        {{item}}
+      </ion-label>
+    </ion-item>
+    <ion-ripple-effect></ion-ripple-effect>
+  </ion-list>
+</ion-content>

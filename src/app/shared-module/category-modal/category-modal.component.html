@@ -1,0 +1,85 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title *ngIf="!symptomOrAction || filteredSymptomOrAction.length == 0 || !currentItem.expanded">
+      Select one category
+    </ion-title>
+    <ion-title *ngIf="symptomOrAction && filteredSymptomOrAction.length !== 0 && currentItem.expanded">
+      Select one {{symptomOrAction | lowercase}}
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="close()"> Close </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content #content (ionScroll)="scroll($event)" [scrollEvents]="true">
+
+  <ng-container *ngIf="!accordion">
+
+    <ion-virtual-scroll [items]="categoryList" id="virtualScroll">
+
+        <ion-item *virtualItem="let item" (tap)="close(item)" lines="full" button detail>
+          <ion-label text-wrap>{{item}}</ion-label>
+        </ion-item>
+
+      </ion-virtual-scroll>
+      
+  </ng-container>
+
+
+  <ng-container *ngIf="accordion">
+
+      <ion-list *ngFor="let item of categoryList">
+        <ion-item lines="full" [class.section-active]="item.expanded" button detail [detailIcon]="item.expanded ? 'ios-arrow-up' : 'ios-arrow-down'" (click)="expandItem(item)">
+          <ion-label text-wrap> {{item.categoryList}} </ion-label>
+        </ion-item>
+
+        <ng-container *ngIf="item.expanded">
+
+          <ion-item (click)="close(test)" button detail lines="full" *ngFor="let test of filteredSymptomOrAction">
+            <ion-avatar slot="start">
+              <img [src]="test.icon" height="40" width="40" />
+            </ion-avatar>
+            <ion-label text-wrap>
+              {{returnLanguage(test)}}
+            </ion-label>
+          </ion-item>
+        </ng-container>
+
+      </ion-list>
+
+  </ng-container>
+
+
+
+
+  <!-- fab placed to the bottom end -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="buttonShown">
+    <ion-fab-button size="small" (tap)="scrollToItem()">
+      <ion-icon name="ios-arrow-dropup"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+</ion-content>
+<style>
+  .list-md {
+    padding-top: 0px;
+    padding-bottom: 0px;
+  }
+
+  .list-ios {
+    margin-top: 0px;
+    /*in ios is -1px which the last item in the list for action no lines="full" shown*/
+  }
+
+  /*
+  ion-avatar { 
+    width: 55px;
+    height: 55px;
+  } 
+  */
+  .section-active {
+    --ion-item-background: #007aff;
+    --color: white;
+  }
+</style>

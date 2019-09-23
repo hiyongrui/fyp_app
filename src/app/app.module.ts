@@ -16,8 +16,11 @@ import { Camera } from '@ionic-native/camera/ngx';
 import { File } from '@ionic-native/file/ngx';
 import { FileOpener } from '@ionic-native/file-opener/ngx';
 import * as Hammer from 'hammerjs';
-import { TemplatePopComponent } from './templates/template-pop/template-pop.component';
-
+import { iosTransitionAnimation } from '@ionic/core/dist/collection/utils/transition/ios.transition.js';
+import { MenuPopoverComponent } from './shared-module/menu-popover/menu-popover.component';
+import { CategoryModalComponent } from './shared-module/category-modal/category-modal.component';
+//https://forum.ionicframework.com/t/page-transition-direction-in-ionic-4/148518/7
+//https://github.com/ionic-team/ionic/issues/16829
 
 export class CustomHammerConfig extends HammerGestureConfig {
   // overrides = {
@@ -34,9 +37,9 @@ export class CustomHammerConfig extends HammerGestureConfig {
 }
 
 @NgModule({
-  declarations: [AppComponent, TemplatePopComponent],
-  entryComponents: [TemplatePopComponent],
-  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, IonicStorageModule.forRoot()],
+  declarations: [AppComponent, MenuPopoverComponent, CategoryModalComponent],
+  entryComponents: [MenuPopoverComponent, CategoryModalComponent],
+  imports: [BrowserModule, IonicModule.forRoot({navAnimation: iosTransitionAnimation}), AppRoutingModule, IonicStorageModule.forRoot()],
   providers: [
     StatusBar,
     SplashScreen,

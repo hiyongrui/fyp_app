@@ -120,7 +120,7 @@ export class AppComponent {
     },
     {
       id: uuid(),
-      enName: "Good health condition",
+      enName: "Good health condition test length elipisis nyp show text wrap",
       chName: "身体状况良好",
       myName: "Keadaan kesihatan yang baik",
       tmName: "நல்ல உடல்நிலை",

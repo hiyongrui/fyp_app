@@ -7,11 +7,11 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/settings"></ion-back-button>
     </ion-buttons>
-
+    <!--
     <ion-buttons slot="end">
       <ion-button (click)="goToAddPage()"> New </ion-button>
     </ion-buttons>
-
+    !-->
   </ion-toolbar>
 </ion-header>
 
@@ -52,7 +52,7 @@
         <ion-item-sliding *virtualItem="let item" (ionSwipe)="deleteIOS(item)" class="ion-activatable">
           <ion-item (tap)="selectedSymptom(item.id)" detail>
             <ion-thumbnail slot="start">
-              <img [src]="item.icon" width="45" height="45" margin-end/> 
+              <img [src]="item.icon" width="45" height="45" margin-end/>
               <!-- <ion-img [src]="item.icon" cache="true"></ion-img> -->
             </ion-thumbnail>
             <!-- <ion-img style="width:80px; height:100px" [src]="item.icon"></ion-img> -->

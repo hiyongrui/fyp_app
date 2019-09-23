@@ -50,6 +50,10 @@ const routes: Routes = [
                         loadChildren: '../settings/view-settings/view-settings.module#ViewSettingsPageModule'
                     },
                     {
+                        path: 'category',
+                        loadChildren: '../settings/category/category.module#CategoryPageModule'
+                    },
+                    {
                         path: 'symptomAction',
                         children: [
                             {

@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar color="primary">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/settings/symptomAction" (click)="goBack()"></ion-back-button>
+      <ion-back-button defaultHref="/tabs/settings/symptomAction"></ion-back-button>
     </ion-buttons>
     <ion-title>
       {{contentDetails.enName}}
@@ -16,7 +16,7 @@
 <style>
   .imgCircle {
     border-radius: 50%;
-    height: 33%;
+    height: 25%;
     margin: 0 auto;
     /* margin-top: 6%; */
   }
@@ -84,7 +84,7 @@
     <p> {{contentDetails.enName}} </p> 
     -->
     
-  <ion-img class="imgCircle" [src]="contentDetails.icon || 'assets/empty.svg'" (click)="takePhoto(0)"></ion-img>
+  <ion-img class="imgCircle" [src]="contentDetails.icon || 'assets/empty.svg'"></ion-img>
 
 
   <!-- <ion-input type="text" [(ngModel)]="contentDetails.enName"></ion-input> -->

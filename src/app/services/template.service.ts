@@ -4,7 +4,8 @@ import {v4 as uuid} from 'uuid';
 import { Symptom } from '../models/symptomaction';
 import { SymptomActionService } from './symptomaction.service';
 import { ActionSheetController, ToastController, AlertController, PopoverController, ModalController, Platform } from '@ionic/angular';
-import { TemplatePopComponent } from './../templates/template-pop/template-pop.component';
+import { MenuPopoverComponent } from '../shared-module/menu-popover/menu-popover.component';
+import { CategoryModalComponent } from '../shared-module/category-modal/category-modal.component';
 
 const TEMPLATE_KEY = "templateKey";
 @Injectable({
@@ -168,7 +169,7 @@ export class TemplateService {
   globalLanguage = [[0, "English"], [1, "中文"], [2, "Malay"], [3, "Tamil"]];
   globalSymptom = ["Symptom", "症状", "gejala", "அறிகுறி"];
   globalAction = ["Action", "行动", "tindakan", "நடவடிக்கை"];
-  globalCategory = ["Diabetes", "Blood Pressure", "Flu test length ellipsis if too long text", "Fever"]
+  globalCategory = ["Diabetes", "Blood Pressure", "Flu test length ellipsis if too long text wrap of nyp length", "Fever", "nosymptomactiontest"]
 
   selectRadio(defaultLanguage) {
     let completedArray = this.getAllArray();
@@ -326,22 +327,11 @@ export class TemplateService {
   }
 
   //https://stackoverflow.com/questions/48133216/custom-icons-on-ionic-select-with-actionsheet-interface-ionic2
-  presentActionSheet(symptomOrAction, item, defaultLanguage) { //https://ionicframework.com/docs/api/action-sheet
-    this.popOverController('modal', '', this.globalCategory, '', "Category").then(callModal => {
-      callModal.present();
-      callModal.onDidDismiss().then(data => {
-        if (!data.data) return false;
-        symptomOrAction = symptomOrAction == "updateAction" ? "Action" : symptomOrAction
-        let typeToCall = symptomOrAction == 'Symptom' ? this.settingSymptom: this.settingAction;
-        let filteredSymptomOrAction = typeToCall.filter(x => x.categoryID == data.data);
-        if (this.checkSymptomOrActionEmpty(symptomOrAction, filteredSymptomOrAction)) return false;
-        this.presentSymptomActionModal(symptomOrAction, item, defaultLanguage, filteredSymptomOrAction);
-      })
-    })
-  }
-
-  presentSymptomActionModal(symptomOrAction, item, defaultLanguage, filteredSymptomOrAction) {
-    this.popOverController('modal', '', filteredSymptomOrAction, defaultLanguage, symptomOrAction).then(callModal => {
+  presentSymptomActionModal(symptomOrAction, item, defaultLanguage) { //https://ionicframework.com/docs/api/action-sheet
+    let convertedListToObj = this.globalCategory.map(str => ({categoryList: str}));
+    symptomOrAction = symptomOrAction == "updateAction" ? "Action" : symptomOrAction
+    let symptomOrActionList = symptomOrAction == 'Symptom' ? this.settingSymptom: this.settingAction;
+    this.openModal(true, convertedListToObj, symptomOrAction, symptomOrActionList).then(callModal => {
       callModal.present();
       callModal.onDidDismiss().then(data => {
         if (!data.data) return false;
@@ -357,13 +347,6 @@ export class TemplateService {
         }
       })
     })
-    // const actionSheet = await this.actionSheetCtrl.create({
-    //   header: "Select a " + symptomOrAction.toLowerCase() + " from below",
-    //   cssClass: "wholeActionSheet",
-    //   buttons: this.createButtons(item, symptomOrAction, defaultLanguage),
-    //   mode: "ios"
-    // });
-    // await actionSheet.present();
   }
 
   returnLanguage(element, defaultLanguage) {
@@ -371,53 +354,6 @@ export class TemplateService {
     return elementArray[defaultLanguage] || element.enName;
   }
 
-  createButtons(itemToUpdate, type, defaultLanguage) {
-    let buttons = [];
-    let typeToCall = type == "Symptom" ? this.settingSymptom : this.settingAction
-    typeToCall.forEach((element: Symptom, index) => {
-      let style = document.createElement('style'); //https://github.com/ionic-team/ionic/issues/6589
-      style.type = "text/css";
-      style.innerHTML = ".customCSSClass" + index + '{background: url('+ "'" + element.icon + "'" + ') no-repeat !important; padding: 40px 20% 40px 25% !important; margin-top:25px !important; background-size:80px 80px !important; margin-left: 30px !important;}';
-      document.getElementsByTagName('head')[0].appendChild(style);
-
-      let elementArray = [element.enName, element.chName, element.myName, element.tmName];
-      let nameLanguage = elementArray[defaultLanguage] || element.enName;
-
-      let button = {
-        // text: element.enName,
-        text: nameLanguage,
-        //icon: "assets/icon/cough.png",
-        cssClass: 'customCSSClass'+ index,
-        handler: () => {
-          console.log(`${element.enName} clicked and full element --> ` + JSON.stringify(element, null, 2));
-          console.log("item to update ==> " + JSON.stringify(itemToUpdate, null, 2));
-      //put zone here
-          this.zone.run(() => {
-            if (type == "Symptom") {
-              itemToUpdate.symptom.text = nameLanguage;
-              itemToUpdate.symptom.img = element.icon;
-              itemToUpdate.symptom.symptomID = element.id;
-            }
-            else {
-              console.log("update action?");
-              itemToUpdate.text = nameLanguage;
-              itemToUpdate.img = element.icon;
-              itemToUpdate.actionID = element.id;
-            }
-          })
-          console.warn("item to update " + JSON.stringify(itemToUpdate, null, 2));
-          // console.log("whole array = " + JSON.stringify(this.criticalArray));
-        }
-      }
-      buttons.push(button);
-    });
-    buttons.push({
-      text: "CANCEL",
-      icon: "close",
-      role: "selected"
-    })
-    return buttons;
-  }
 
   addNewCriticalArray(type, id, defaultLanguage) {
     // console.log("clicked " + type); //critical or caution or good
@@ -478,7 +414,7 @@ export class TemplateService {
               actionID: ""
             }
             x.combined.push(newAction);
-            this.presentActionSheet("updateAction", newAction, defaultLanguage)
+            this.presentSymptomActionModal("updateAction", newAction, defaultLanguage)
           })
         }
       ]}).then(alert => {
@@ -585,14 +521,45 @@ export class TemplateService {
       })
     })
   }
-
-  popOverController(type, x, menuOptions, defaultLanguage?, symptomOrAction?) {
-    let obj = {component: TemplatePopComponent, componentProps: {menuOptions, type, defaultLanguage, symptomOrAction}};
-    return type == 'modal' ? this.modalCtrl.create(obj) : this.popoverCtrl.create({...obj, event: x});
-  }
   
+  openModal(accordion: boolean, categoryList, symptomOrAction?, symptomOrActionList?) {
+    return this.modalCtrl.create({
+      component: CategoryModalComponent,
+      componentProps: {accordion, categoryList, symptomOrAction, symptomOrActionList}
+    })
+  }
+
+  openPopover(menuOptions, event) {
+    return this.popoverCtrl.create({
+      component: MenuPopoverComponent,
+      event: event,
+      componentProps: {menuOptions}
+    })
+  }
+
   checkPlatformAndroid() {
     return this.plt.is("android")
+  }
+  
+  checkDuplicateName(type, name) {
+    let keyToCall = type == "template" ? TEMPLATE_KEY : "planKey";
+    return this.storage.get(keyToCall).then(list => {
+      list = list || [];
+      let newName = name;
+      let count = 0; 
+
+      let recursion = function(value) {
+        let checkList = type == "template" ? list.some(x => x.name.toLowerCase() == value.toLowerCase()) : list.some(y => y.planName.toLowerCase() == value.toLowerCase())
+        if (checkList) {
+          count++;
+          newName = name + " (" + count + ")";
+          return recursion(newName); 
+        }
+      }
+      recursion(newName); //https://www.sitepoint.com/recursion-functional-javascript/
+
+      return newName;
+    })
   }
   
 } //end of class

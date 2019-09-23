@@ -6,6 +6,7 @@ import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms'
 import { TemplateService } from 'src/app/services/template.service';
 
 import { Camera, CameraOptions } from '@ionic-native/camera/ngx';
+import { Events } from '@ionic/angular';
 
 @Component({
   selector: 'app-edit-settings',
@@ -33,7 +34,7 @@ export class EditSettingsPage implements OnInit {
   })
 
   constructor(private activatedRoute: ActivatedRoute, private settingService: SymptomActionService, public formBuilder: FormBuilder, private router:Router, 
-    private templateService: TemplateService, private camera: Camera) { }
+    private templateService: TemplateService, private camera: Camera, private event: Events) { }
 
   ngOnInit() {
     this.editID = this.activatedRoute.snapshot.paramMap.get("id");
@@ -94,7 +95,9 @@ export class EditSettingsPage implements OnInit {
       }) :
       this.settingService.updateOneSetting(this.selectedTab, newValues).then(() => {
         this.templateService.presentToastWithOptions("Updated " + this.selectedTab.toLowerCase());
-        this.router.navigate(['/tabs/settings/symptomAction']);
+        this.router.navigate(['/tabs/settings/symptomAction']).then(() => {
+          this.event.publish("category", newValues.categoryID);
+        });
       });
   }
 
@@ -161,7 +164,7 @@ export class EditSettingsPage implements OnInit {
   }
 
   customPop() {
-    this.templateService.popOverController('modal', '', this.templateService.globalCategory, '', "Category").then(callModal => {
+    this.templateService.openModal(false, this.templateService.globalCategory).then(callModal => {
       callModal.present();
       callModal.onDidDismiss().then(data => {
         if (!data.data) return false;
