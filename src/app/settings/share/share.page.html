@@ -1,0 +1,20 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>
+      Share
+    </ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/settings"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-button expand="full" color="originalPrimary" (click)="exportJSON('plan')">EXPORT ALL PLANS</ion-button>
+
+  <ion-button expand="full" color="originalPrimary" (click)="exportJSON('template')">EXPORT ALL TEMPLATES</ion-button>
+
+  <ion-button expand="full" color="success" (click)="openFile()">IMPORT DATA</ion-button>
+
+</ion-content>

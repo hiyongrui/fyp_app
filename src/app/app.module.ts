@@ -19,6 +19,8 @@ import * as Hammer from 'hammerjs';
 import { iosTransitionAnimation } from '@ionic/core/dist/collection/utils/transition/ios.transition.js';
 import { MenuPopoverComponent } from './shared-module/menu-popover/menu-popover.component';
 import { CategoryModalComponent } from './shared-module/category-modal/category-modal.component';
+import { FileChooser } from '@ionic-native/file-chooser/ngx';
+import { FilePath } from '@ionic-native/file-path/ngx';
 //https://forum.ionicframework.com/t/page-transition-direction-in-ionic-4/148518/7
 //https://github.com/ionic-team/ionic/issues/16829
 
@@ -46,6 +48,8 @@ export class CustomHammerConfig extends HammerGestureConfig {
     Camera,
     File,
     FileOpener,
+    FileChooser,
+    FilePath,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     { provide: HAMMER_GESTURE_CONFIG, useClass: CustomHammerConfig }
   ],

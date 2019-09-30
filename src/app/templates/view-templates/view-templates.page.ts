@@ -47,6 +47,7 @@ export class ViewTemplatesPage implements OnInit {
   loadTemplates() {
     this.templateService.getAllTemplate("templateKey").then(val => {
       val = val || []; //prevent null if val empty at start no storage
+      console.warn("view template", val);
       this.allTemplate = val.map((element, index) => {
         element.templates.forEach(x => {
           x.length && x.forEach(y => {
@@ -98,10 +99,6 @@ export class ViewTemplatesPage implements OnInit {
         this.event.publish("view", modifiedTemplate);
       })
     })
-  }
-
-  itemHeightFn(item, index) { //method to prevent virtual scroll flicker when navigate between tabs
-    return 190; //https://github.com/ionic-team/ionic/issues/17540#issuecomment-511136665
   }
 
 }

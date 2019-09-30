@@ -15,7 +15,7 @@ export class ViewSettingsPage implements OnInit {
   }
 
   onClick(id) {
-    let settingURLArray = ['/tabs/settings/category', '/tabs/settings/tutorial', '/tabs/settings/about'];
+    let settingURLArray = ['/tabs/settings/category', '/tabs/settings/tutorial', '/tabs/settings/about', '/tabs/settings/share'];
     this.router.navigateByUrl(settingURLArray[id]); //routing start from root level
   }
 

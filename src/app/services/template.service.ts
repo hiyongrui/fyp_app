@@ -6,6 +6,7 @@ import { SymptomActionService } from './symptomaction.service';
 import { ActionSheetController, ToastController, AlertController, PopoverController, ModalController, Platform } from '@ionic/angular';
 import { MenuPopoverComponent } from '../shared-module/menu-popover/menu-popover.component';
 import { CategoryModalComponent } from '../shared-module/category-modal/category-modal.component';
+import { File } from '@ionic-native/file/ngx';
 
 const TEMPLATE_KEY = "templateKey";
 @Injectable({
@@ -13,7 +14,7 @@ const TEMPLATE_KEY = "templateKey";
 })
 export class TemplateService {
 
-  constructor(private storage: Storage, private settingService: SymptomActionService, private actionSheetCtrl: ActionSheetController, private zone: NgZone, 
+  constructor(private storage: Storage, private settingService: SymptomActionService, private actionSheetCtrl: ActionSheetController, private zone: NgZone, private file: File,
     private toastCtrl: ToastController, private alertCtrl: AlertController, private popoverCtrl: PopoverController, private modalCtrl: ModalController, private plt: Platform) { }
 
   createTemplate(finalArray, templateNameFromInput, templateID, templateNameUpdate, defaultLanguage) {
@@ -560,6 +561,29 @@ export class TemplateService {
 
       return newName;
     })
+  }
+
+  addTemplateFromSharing(templates) {
+    return this.getAllTemplate(TEMPLATE_KEY).then(data => {
+      data = data || [];
+      let counter = 0;
+      templates.forEach(element => {
+        data.push(element);
+        counter++;
+      });
+      console.log("template array set", data);
+      this.presentToastWithOptions(counter + " template imported successfully");
+      return this.storage.set(TEMPLATE_KEY, data)
+    })
+  }
+  
+  exportJSON(json, msg) {
+    console.warn("json exported", json);
+    let path = this.file.externalRootDirectory + '/Download/'; // for Android https://stackoverflow.com/questions/49051139/saving-file-to-downloads-directory-using-ionic-3
+    this.file.writeFile(path, "sampleionicfile.json", JSON.stringify(json), { replace: true }).then(() => {
+      //TODO: open email, with json file attached, after that removeFile()
+      this.presentToastWithOptions(msg);
+    }, (err) => this.presentToastWithOptions("Sorry error" + err));
   }
   
 } //end of class

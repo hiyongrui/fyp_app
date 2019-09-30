@@ -75,30 +75,6 @@ export class PlanService {
     });
   }
 
-  //new plan
-  addNewPlan(newitem) {
-    return this.storage.get(key).then((items) => {
-      if (items) {
-        items.push(newitem);
-        return this.storage.set(key, items);
-      } else {
-        return this.storage.set(key, [newitem]);
-      }
-    });
-  }
-
-  //add language
-  addLanguage(newitem) {
-    return this.storage.get(key).then((items) => {
-      if (items) {
-        items.push(newitem);
-        return this.storage.set(key, items);
-      } else {
-        return this.storage.set(key, [newitem]);
-      }
-    });
-  }
-
   //edit
   editPlan(id, details) {
     return this.storage.get(key).then((items) => {
@@ -136,6 +112,20 @@ export class PlanService {
       let duplicatedItem = {...itemFound, id: uuid(), planName: planName}
       data.unshift(duplicatedItem);
       return this.storage.set(key, data);
+    })
+  }
+
+  addPlanFromSharing(plans) {
+    return this.getAllPlan().then(data => {
+      data = data || [];
+      let counter = 0;
+      plans.forEach(element => {
+        data.unshift(element);
+        counter++;
+      });
+      console.log("plans array set", data);
+      this.templateService.presentToastWithOptions(counter + " plan imported successfully");
+      return this.storage.set(key, data)
     })
   }
 

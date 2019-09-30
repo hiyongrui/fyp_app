@@ -126,7 +126,7 @@ export class EditplanPage implements OnInit {
   }
 
   popOverController(event) {
-    let menuOptions = ["Edit", "Rename", "Duplicate", "Create Crisis Template", "Export to PDF"];
+    let menuOptions = ["Edit", "Rename", "Duplicate", "Create Crisis Template", "Export to PDF", "Share plan"];
     this.templateService.openPopover(menuOptions, event).then(popover => {
       popover.present();
       popover.onDidDismiss().then((data) => {
@@ -141,7 +141,8 @@ export class EditplanPage implements OnInit {
       'Rename': () => this.askForName('rename'),
       'Duplicate': () => this.askForName('duplicate'),
       "Create Crisis Template": () => this.askForName("Create Crisis Template"),
-      "Export to PDF": () => this.exportToPDF()
+      "Export to PDF": () => this.exportToPDF(),
+      "Share plan": () => this.share()
     };
     call[type]();
   }
@@ -305,6 +306,14 @@ export class EditplanPage implements OnInit {
 
   dragAndCheckLongPress(slideItem: IonItemSliding) {
     slideItem.close();
+  }
+
+  share() {
+    let json = {
+      type: "plan",
+      data: [this.details]
+    }
+    this.templateService.exportJSON(json, "Plan exported!");
   }
 
 }

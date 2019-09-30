@@ -178,7 +178,7 @@ export class NewTemplatesPage implements OnInit {
 
 
   popOverController(event) {
-    let menuOptions = ["Edit", "Rename", "Duplicate", "Create Crisis Plan", "Delete"];
+    let menuOptions = ["Edit", "Rename", "Duplicate", "Create Crisis Plan", "Delete", "Share template"];
     this.templateService.openPopover(menuOptions, event).then(popover => {
       popover.present();
       popover.onDidDismiss().then((data) => { //method 2 ngOnInIt inside onDidDismiss()
@@ -194,6 +194,7 @@ export class NewTemplatesPage implements OnInit {
       'Duplicate': () => this.askForName('duplicate'),
       "Create Crisis Plan": () => this.askForName('Create Crisis Plan'),
       "Delete": () => this.delete(),
+      "Share template": () => this.share()
       // "Export to PDF": () => this.exportToPDF()
     };
     call[type]();
@@ -401,6 +402,16 @@ export class NewTemplatesPage implements OnInit {
         this.router.navigate(["/tabs/templates"], {replaceUrl: true});
       });
     }).catch(() => {})
+  }
+
+  share() {
+    this.templateService.getOneTemplate(this.templateID).then(templateObj => {
+      let json = {
+        type: "template",
+        data: [templateObj]
+      }
+      this.templateService.exportJSON(json, "Template exported!");
+    })
   }
 
 }

@@ -73,6 +73,10 @@ const routes: Routes = [
                     { 
                         path: 'about', 
                         loadChildren: '../settings/about/about.module#AboutPageModule' 
+                    },
+                    {
+                        path: 'share',
+                        loadChildren: '../settings/share/share.module#SharePageModule'
                     }
                 ]
             }
