@@ -21,6 +21,8 @@ import { MenuPopoverComponent } from './shared-module/menu-popover/menu-popover.
 import { CategoryModalComponent } from './shared-module/category-modal/category-modal.component';
 import { FileChooser } from '@ionic-native/file-chooser/ngx';
 import { FilePath } from '@ionic-native/file-path/ngx';
+import { IOSFilePicker } from '@ionic-native/file-picker/ngx';
+import { EmailComposer } from '@ionic-native/email-composer/ngx';
 //https://forum.ionicframework.com/t/page-transition-direction-in-ionic-4/148518/7
 //https://github.com/ionic-team/ionic/issues/16829
 
@@ -50,6 +52,8 @@ export class CustomHammerConfig extends HammerGestureConfig {
     FileOpener,
     FileChooser,
     FilePath,
+    IOSFilePicker,
+    EmailComposer,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     { provide: HAMMER_GESTURE_CONFIG, useClass: CustomHammerConfig }
   ],

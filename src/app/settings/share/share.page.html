@@ -13,8 +13,12 @@
 
   <ion-button expand="full" color="originalPrimary" (click)="exportJSON('plan')">EXPORT ALL PLANS</ion-button>
 
-  <ion-button expand="full" color="originalPrimary" (click)="exportJSON('template')">EXPORT ALL TEMPLATES</ion-button>
+  <ion-button expand="full" color="danger" (click)="exportJSON('template')">EXPORT ALL TEMPLATES</ion-button>
 
-  <ion-button expand="full" color="success" (click)="openFile()">IMPORT DATA</ion-button>
+  <ion-fab vertical="center" horizontal="center" slot="fixed">
+    <ion-fab-button (click)="android ? openAndroid() : openIOS()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 
 </ion-content>

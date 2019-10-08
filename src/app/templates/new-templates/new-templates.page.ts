@@ -410,7 +410,7 @@ export class NewTemplatesPage implements OnInit {
         type: "template",
         data: [templateObj]
       }
-      this.templateService.exportJSON(json, "Template exported!");
+      this.templateService.exportJSON(json, "template_" + templateObj.name);
     })
   }
 

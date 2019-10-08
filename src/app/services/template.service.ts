@@ -7,6 +7,7 @@ import { ActionSheetController, ToastController, AlertController, PopoverControl
 import { MenuPopoverComponent } from '../shared-module/menu-popover/menu-popover.component';
 import { CategoryModalComponent } from '../shared-module/category-modal/category-modal.component';
 import { File } from '@ionic-native/file/ngx';
+import { EmailComposer } from '@ionic-native/email-composer/ngx';
 
 const TEMPLATE_KEY = "templateKey";
 @Injectable({
@@ -15,7 +16,8 @@ const TEMPLATE_KEY = "templateKey";
 export class TemplateService {
 
   constructor(private storage: Storage, private settingService: SymptomActionService, private actionSheetCtrl: ActionSheetController, private zone: NgZone, private file: File,
-    private toastCtrl: ToastController, private alertCtrl: AlertController, private popoverCtrl: PopoverController, private modalCtrl: ModalController, private plt: Platform) { }
+    private toastCtrl: ToastController, private alertCtrl: AlertController, private popoverCtrl: PopoverController, private modalCtrl: ModalController, private plt: Platform,
+    private emailComposer: EmailComposer) { }
 
   createTemplate(finalArray, templateNameFromInput, templateID, templateNameUpdate, defaultLanguage) {
     return this.getAllTemplate(TEMPLATE_KEY).then(data => {
@@ -286,7 +288,7 @@ export class TemplateService {
       let alert = await this.alertCtrl.create({
         header: templateName,
         message: "",
-        cssClass: "testCSS",
+        cssClass: "alertInputCSS",
         inputs: [
           {
             name: 'nameInput',
@@ -314,6 +316,9 @@ export class TemplateService {
                 this.presentToastWithOptions("Name too long!");
                 return false;
               }
+              else if (!this.checkSpecialCharacters(alertData.nameInput.trim(), alert)) {
+                return false;
+              }
               resolve(alertData.nameInput.trim());
             }
           }
@@ -332,7 +337,7 @@ export class TemplateService {
     let convertedListToObj = this.globalCategory.map(str => ({categoryList: str}));
     symptomOrAction = symptomOrAction == "updateAction" ? "Action" : symptomOrAction
     let symptomOrActionList = symptomOrAction == 'Symptom' ? this.settingSymptom: this.settingAction;
-    this.openModal(true, convertedListToObj, symptomOrAction, symptomOrActionList).then(callModal => {
+    this.openModal(true, convertedListToObj, symptomOrAction, symptomOrActionList, defaultLanguage).then(callModal => {
       callModal.present();
       callModal.onDidDismiss().then(data => {
         if (!data.data) return false;
@@ -448,7 +453,8 @@ export class TemplateService {
       buttons: [{
         text: 'CLOSE',
         role: 'cancel'
-      }]
+      }],
+      cssClass: 'toastCSS'
     });
     toast.present();
   }
@@ -523,10 +529,10 @@ export class TemplateService {
     })
   }
   
-  openModal(accordion: boolean, categoryList, symptomOrAction?, symptomOrActionList?) {
+  openModal(accordion: boolean, categoryList, symptomOrAction?, symptomOrActionList?, defaultLanguage?) {
     return this.modalCtrl.create({
       component: CategoryModalComponent,
-      componentProps: {accordion, categoryList, symptomOrAction, symptomOrActionList}
+      componentProps: {accordion, categoryList, symptomOrAction, symptomOrActionList, defaultLanguage}
     })
   }
 
@@ -547,13 +553,13 @@ export class TemplateService {
     return this.storage.get(keyToCall).then(list => {
       list = list || [];
       let newName = name;
-      let count = 0; 
+      let counter = 0; 
 
       let recursion = function(value) {
-        let checkList = type == "template" ? list.some(x => x.name.toLowerCase() == value.toLowerCase()) : list.some(y => y.planName.toLowerCase() == value.toLowerCase())
-        if (checkList) {
-          count++;
-          newName = name + " (" + count + ")";
+        let nameFound = type == "template" ? list.some(x => x.name.toLowerCase() == value.toLowerCase()) : list.some(y => y.planName.toLowerCase() == value.toLowerCase())
+        if (nameFound) {
+          counter++;
+          newName = name + " (" + counter + ")";
           return recursion(newName); 
         }
       }
@@ -563,27 +569,115 @@ export class TemplateService {
     })
   }
 
-  addTemplateFromSharing(templates) {
+  styles = ['color: green', 'background: yellow'].join(";"); //([(\d)^/]+)$
+  
+  checkNameCounter(list, type, name) {
+    list = list || [];
+    let counterFound = name.endsWith(`(1)`);
+    let withoutCounter = counterFound ? name.substring(0, name.lastIndexOf(`(1)`)).trim() : name;
+    //name (1) --> name 
+    let newName = name;
+    console.error("name to start", newName);
+    console.warn("without counter", withoutCounter);
+    let counter = 0; 
+  
+    let recursion = function(value) {
+      let nameFound = type == "template" ? list.some(x => x.name.toLowerCase() == value.toLowerCase()) : list.some(y => y.planName.toLowerCase() == value.toLowerCase())
+      if (nameFound) {
+        
+        counter++;
+        console.warn("counter", counter, "\nName", name, "\nvalue", value, "\nnewName", newName);
+    
+        newName = withoutCounter + " (" + counter + ")";
+        console.error("new name", newName);
+        return recursion(newName); 
+      }
+      else {
+        console.warn("%c end of recursion\ncounter\n" + counter + "\nName" + name + "\nvalue" + value + "\nnewName" + newName, this.styles);
+      }
+    }.bind(this) ////https://stackoverflow.com/questions/20279484/how-to-access-the-correct-this-inside-a-callback
+    recursion(newName); 
+    console.error("end name", newName);
+    return newName;
+  }
+
+  checkDateExistInName(name, counter) {
+    let todayDate = this.getTodayDate();
+    let dateFound = name.indexOf(todayDate) > -1 ? true : false;
+    console.error("date found", dateFound, name, counter);
+  
+    name = dateFound && counter == 0 ? `${name}` : //true, 0
+          dateFound ? `${name} (${counter})` : // 3rd_10-7-2019 --> 3rd_10-7-2019 (1) //true, !0
+          counter == 0 ? `${name}_${todayDate}` : `${name}_${todayDate} (${counter})`; //false, 0 and false, !0
+                          //3rd --> 3rd_10-7-2019   3rd_10-7-2019 (1) --> 3rd_10-7-2019 (2)
+    return name;
+  }
+
+  addTemplateFromSharing(templatesToAdd, type) {
     return this.getAllTemplate(TEMPLATE_KEY).then(data => {
       data = data || [];
-      let counter = 0;
-      templates.forEach(element => {
-        data.push(element);
-        counter++;
+      templatesToAdd.forEach(element => {
+        let checkIndex = data.findIndex(x => x.id == element.id);
+        element.name = this.checkNameCounter(data, type, element.name);
+        checkIndex > -1 ? data[checkIndex] = element : data.push(element);
       });
       console.log("template array set", data);
-      this.presentToastWithOptions(counter + " template imported successfully");
+      this.presentToastWithOptions(templatesToAdd.length + " template imported successfully");
       return this.storage.set(TEMPLATE_KEY, data)
     })
   }
   
-  exportJSON(json, msg) {
+  exportJSON(json, fileName) {
+    json.identifier = "Crisis Management";
     console.warn("json exported", json);
-    let path = this.file.externalRootDirectory + '/Download/'; // for Android https://stackoverflow.com/questions/49051139/saving-file-to-downloads-directory-using-ionic-3
-    this.file.writeFile(path, "sampleionicfile.json", JSON.stringify(json), { replace: true }).then(() => {
+    let path = this.file.dataDirectory;
+    let fileNameChecked = this.checkDateExistInName(fileName, 0) + ".txt";
+    // let fileNameWithDate = fileName + "_" + this.getTodayDate() + ".txt";
+    
+    this.file.writeFile(path, fileNameChecked, JSON.stringify(json), { replace: true }).then(() => {
       //TODO: open email, with json file attached, after that removeFile()
-      this.presentToastWithOptions(msg);
-    }, (err) => this.presentToastWithOptions("Sorry error" + err));
+      let emailObj = {
+        to: 'nypmedieasy@gmail.com',
+        cc: 'nypmedieasy@gmail.com',
+        attachments: [path + fileNameChecked],
+        subject: `${json.data.length} ${json.type} exported on ${this.getTodayDate()}`,
+        body: 'Attached is the body msg',
+        isHtml: true
+      };
+      this.emailComposer.open(emailObj).then(() => {
+        console.warn("email .open()");
+        setTimeout(() => {
+          this.file.removeFile(path, fileNameChecked);
+        }, 300);
+      });
+    }, (err) => this.throwError("Sorry error sharing file!", err));
+  }
+  
+  getTodayDate() {
+    let dateObj = new Date(); //https://stackoverflow.com/questions/1531093/how-do-i-get-the-current-date-in-javascript
+    let todayDate = `${dateObj.getDate()}-${dateObj.getMonth() + 1}-${dateObj.getFullYear()}`; //or new Date().toLocaleDateString('en-GB').replace(/\//g, "-"))
+    return todayDate;
+  }
+  
+  throwError(msg, err) {
+    console.error(msg, err);
+    this.presentToastWithOptions(msg);
+  }
+
+  checkSpecialCharacters(name, alert) {
+    //https://stackoverflow.com/questions/2679699/what-characters-allowed-in-file-names-on-android
+    //TODO: if input invalid, prompt user which are the invalid characters, on window file name is
+    let regexList = ["/", "\\\\", ":", "*", "?", "\"", "<", ">", "|"]; //https://www.regextester.com/99810, https://jsbin.com/dodimovawa/edit?html,js,console,output
+    let regExp = new RegExp("[" + regexList.join("") + "]", 'g');
+    let matches = Array.from(new Set(name.match(regExp)));
+    if (matches.length > 0) {
+      let errMsg = "Special characters not allowed:\n" + matches.join(" ");
+      this.presentToastWithOptions(errMsg);
+      alert.message = errMsg;
+      return false;
+    }
+    return true;
+    //https://stackoverflow.com/questions/23136947/javascript-regex-to-return-letters-only
   }
   
 } //end of class

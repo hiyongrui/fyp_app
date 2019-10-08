@@ -115,16 +115,16 @@ export class PlanService {
     })
   }
 
-  addPlanFromSharing(plans) {
+  addPlanFromSharing(plansToAdd, type) {
     return this.getAllPlan().then(data => {
       data = data || [];
-      let counter = 0;
-      plans.forEach(element => {
-        data.unshift(element);
-        counter++;
+      plansToAdd.forEach(element => {
+        let checkIndex = data.findIndex(x => x.id == element.id);
+        element.name = this.templateService.checkNameCounter(data, type, element.name);
+        checkIndex > -1 ? data[checkIndex] = element : data.unshift(element);
       });
       console.log("plans array set", data);
-      this.templateService.presentToastWithOptions(counter + " plan imported successfully");
+      this.templateService.presentToastWithOptions(plansToAdd.length + " plan imported successfully");
       return this.storage.set(key, data)
     })
   }

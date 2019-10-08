@@ -209,7 +209,7 @@ export class EditplanPage implements OnInit {
           }).then(alert => alert.present())
           this.templateService.presentToastWithOptions("Please install a PDF Viewer app such as Adobe Acrobat!")
         });
-      }).catch((error) => this.templateService.presentToastWithOptions("An error has occured!!!"));
+      }).catch((error) => this.templateService.throwError("Error exporting PDF!!!", error));
     })
   }
 
@@ -313,7 +313,7 @@ export class EditplanPage implements OnInit {
       type: "plan",
       data: [this.details]
     }
-    this.templateService.exportJSON(json, "Plan exported!");
+    this.templateService.exportJSON(json, "plan_" + this.details.planName);
   }
 
 }
