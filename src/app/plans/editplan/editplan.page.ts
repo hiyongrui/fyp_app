@@ -259,7 +259,7 @@ export class EditplanPage implements OnInit {
     }
     else {
       this.templateService.alertInput(inputMsg).then(async (alertData: string) => {
-        let planNameChecked = await this.templateService.checkDuplicateName('plan', alertData);
+        let planNameChecked = await this.templateService.checkDuplicateNameInApp('plan', alertData, typeOfAction, this.details.id);
         if (typeOfAction == 'rename') {
           this.PlanService.renamePlan(this.details.id, planNameChecked).then(() => {
             this.details.planName = planNameChecked;

@@ -32,7 +32,7 @@ export class NewPlanPage implements OnInit {
   defaultLanguage = 0;
 
   @ViewChild('input') thisInput;
-  nextPage() {
+  async nextPage() {
     let planName = this.slideOneForm.controls.firstName;
     if (planName.invalid) {
       this.submitted = true;
@@ -40,8 +40,9 @@ export class NewPlanPage implements OnInit {
       this.thisInput.setFocus();
       return false;
     }
+    let planNameChecked = await this.templateService.checkDuplicateNameInApp('plan', planName.value.trim());
     this.planService.setExtras("extras", "fromNewPlan");
-    this.router.navigateByUrl('/tabs/plans/details/' + this.defaultLanguage + '/' + planName.value.trim());
+    this.router.navigateByUrl('/tabs/plans/details/' + this.defaultLanguage + '/' + this.templateService.encodeURIComponent(planNameChecked));
   }
 
   cancel() {

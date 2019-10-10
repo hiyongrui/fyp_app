@@ -162,6 +162,7 @@ export class TemplateService {
   settingAction = [];
 
   setGlobalSettings() {
+    this.frontViewData.forEach(x => x.toggle = false);
     let promises = [this.settingService.getType("Symptom"), this.settingService.getType("Action")];
     Promise.all(promises).then(data => {
       this.settingSymptom = data[0];
@@ -172,7 +173,7 @@ export class TemplateService {
   globalLanguage = [[0, "English"], [1, "中文"], [2, "Malay"], [3, "Tamil"]];
   globalSymptom = ["Symptom", "症状", "gejala", "அறிகுறி"];
   globalAction = ["Action", "行动", "tindakan", "நடவடிக்கை"];
-  globalCategory = ["Diabetes", "Blood Pressure", "Flu test length ellipsis if too long text wrap of nyp length", "Fever", "nosymptomactiontest"]
+  globalCategory = ["Asthma", "COPD", "General", "Heart Failure"];
 
   selectRadio(defaultLanguage) {
     let completedArray = this.getAllArray();
@@ -548,69 +549,41 @@ export class TemplateService {
     return this.plt.is("android")
   }
   
-  checkDuplicateName(type, name) {
+  checkDuplicateNameInApp(type, name, typeOfAction?, id?) {
     let keyToCall = type == "template" ? TEMPLATE_KEY : "planKey";
     return this.storage.get(keyToCall).then(list => {
       list = list || [];
-      let newName = name;
-      let counter = 0; 
-
-      let recursion = function(value) {
-        let nameFound = type == "template" ? list.some(x => x.name.toLowerCase() == value.toLowerCase()) : list.some(y => y.planName.toLowerCase() == value.toLowerCase())
-        if (nameFound) {
-          counter++;
-          newName = name + " (" + counter + ")";
-          return recursion(newName); 
-        }
-      }
-      recursion(newName); //https://www.sitepoint.com/recursion-functional-javascript/
-
+      let originalName = typeOfAction == "rename" ? type == "template" ? list.find(x => x.id == id).name : list.find(x => x.id == id).planName : null;
+      let newName = this.recursionCheck(list, type, name, originalName);
       return newName;
     })
   }
 
-  styles = ['color: green', 'background: yellow'].join(";"); //([(\d)^/]+)$
-  
-  checkNameCounter(list, type, name) {
-    list = list || [];
-    let counterFound = name.endsWith(`(1)`);
-    let withoutCounter = counterFound ? name.substring(0, name.lastIndexOf(`(1)`)).trim() : name;
-    //name (1) --> name 
-    let newName = name;
-    console.error("name to start", newName);
-    console.warn("without counter", withoutCounter);
-    let counter = 0; 
-  
-    let recursion = function(value) {
-      let nameFound = type == "template" ? list.some(x => x.name.toLowerCase() == value.toLowerCase()) : list.some(y => y.planName.toLowerCase() == value.toLowerCase())
-      if (nameFound) {
-        
-        counter++;
-        console.warn("counter", counter, "\nName", name, "\nvalue", value, "\nnewName", newName);
-    
-        newName = withoutCounter + " (" + counter + ")";
-        console.error("new name", newName);
-        return recursion(newName); 
-      }
-      else {
-        console.warn("%c end of recursion\ncounter\n" + counter + "\nName" + name + "\nvalue" + value + "\nnewName" + newName, this.styles);
-      }
-    }.bind(this) ////https://stackoverflow.com/questions/20279484/how-to-access-the-correct-this-inside-a-callback
-    recursion(newName); 
-    console.error("end name", newName);
+  checkDuplicateNameFromSharing(list, type, name, checkIndex) {
+    let originalName = checkIndex > -1 ? type == "template" ? list[checkIndex].name : list[checkIndex].planName : null;
+    let newName = this.recursionCheck(list, type, name, originalName);
     return newName;
   }
 
-  checkDateExistInName(name, counter) {
-    let todayDate = this.getTodayDate();
-    let dateFound = name.indexOf(todayDate) > -1 ? true : false;
-    console.error("date found", dateFound, name, counter);
-  
-    name = dateFound && counter == 0 ? `${name}` : //true, 0
-          dateFound ? `${name} (${counter})` : // 3rd_10-7-2019 --> 3rd_10-7-2019 (1) //true, !0
-          counter == 0 ? `${name}_${todayDate}` : `${name}_${todayDate} (${counter})`; //false, 0 and false, !0
-                          //3rd --> 3rd_10-7-2019   3rd_10-7-2019 (1) --> 3rd_10-7-2019 (2)
-    return name;
+  recursionCheck(list, type, nameInput, originalName) {
+
+    let counterFound = nameInput.match(/\(\d+\)$/); //https://jsbin.com/pawaxasuqe/edit?js,console,output
+    let nameWithoutCounter = counterFound ? nameInput.substring(0, counterFound.index).trimEnd() : nameInput;
+    let newName = nameWithoutCounter;
+    let counter = 0;
+
+    let recursion = function(currentNameInLoop) {
+      let nameFound = type == "template" ? list.some(x => x.name.toLowerCase() == currentNameInLoop.toLowerCase()) : list.some(y => y.planName.toLowerCase() == currentNameInLoop.toLowerCase());
+      //if originalName exist = renaming/updating plan/template
+      if (nameFound && originalName !== nameWithoutCounter && currentNameInLoop !== originalName) {
+        counter++;
+        newName = nameWithoutCounter + " (" + counter + ")";
+        return recursion(newName);
+      }
+    }
+    recursion(nameWithoutCounter);
+
+    return newName;
   }
 
   addTemplateFromSharing(templatesToAdd, type) {
@@ -618,34 +591,32 @@ export class TemplateService {
       data = data || [];
       templatesToAdd.forEach(element => {
         let checkIndex = data.findIndex(x => x.id == element.id);
-        element.name = this.checkNameCounter(data, type, element.name);
+        element.name = this.checkDuplicateNameFromSharing(data, type, element.name, checkIndex);
         checkIndex > -1 ? data[checkIndex] = element : data.push(element);
       });
-      console.log("template array set", data);
       this.presentToastWithOptions(templatesToAdd.length + " template imported successfully");
       return this.storage.set(TEMPLATE_KEY, data)
     })
   }
   
   exportJSON(json, fileName) {
+
     json.identifier = "Crisis Management";
-    console.warn("json exported", json);
     let path = this.file.dataDirectory;
-    let fileNameChecked = this.checkDateExistInName(fileName, 0) + ".txt";
-    // let fileNameWithDate = fileName + "_" + this.getTodayDate() + ".txt";
-    
+    let todayDate = this.getTodayDate();
+    let fileNameChecked = fileName.indexOf(todayDate) > -1 ? `${fileName}.txt` : `${fileName}_${todayDate}.txt`;
+
     this.file.writeFile(path, fileNameChecked, JSON.stringify(json), { replace: true }).then(() => {
       //TODO: open email, with json file attached, after that removeFile()
       let emailObj = {
         to: 'nypmedieasy@gmail.com',
         cc: 'nypmedieasy@gmail.com',
         attachments: [path + fileNameChecked],
-        subject: `${json.data.length} ${json.type} exported on ${this.getTodayDate()}`,
+        subject: `${json.data.length} ${json.type} exported on ${todayDate}`,
         body: 'Attached is the body msg',
         isHtml: true
       };
       this.emailComposer.open(emailObj).then(() => {
-        console.warn("email .open()");
         setTimeout(() => {
           this.file.removeFile(path, fileNameChecked);
         }, 300);
@@ -680,6 +651,13 @@ export class TemplateService {
     //https://stackoverflow.com/questions/23136947/javascript-regex-to-return-letters-only
   }
   
+  encodeURIComponent(str) { //https://stackoverflow.com/questions/39138499/how-can-we-handle-special-characters-in-the-url-with-angular
+    //needed else create crisis plan url cannot have name (1)
+    return encodeURIComponent(str).replace(/[!'()*]/g, function (c) {
+        return '%' + c.charCodeAt(0).toString(16);
+    });
+  }
+
 } //end of class
 
 

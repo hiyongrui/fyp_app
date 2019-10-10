@@ -41,7 +41,6 @@ export class NewTemplatesPage implements OnInit {
         this.defaultLanguage = item.language;
         this.templateService.filterArray(item);
       })
-      this.templateService.setGlobalSettings();
     }
 
   ngOnInit() {
@@ -125,7 +124,7 @@ export class NewTemplatesPage implements OnInit {
       (typeOfAction == "duplicate") ? "Enter name of the duplicated template" :
       (typeOfAction == "Create Crisis Plan") ? "Enter Crisis Plan name" : "Enter template name"
       this.templateService.alertInput(templateName).then(async (alertData: string) => {
-        let templateNameChecked = await this.templateService.checkDuplicateName('template', alertData);
+        let templateNameChecked = await this.templateService.checkDuplicateNameInApp('template', alertData, typeOfAction, this.templateID);
         if (typeOfAction == "rename") {
           this.templateService.renameTemplate(templateNameChecked, this.templateID).then(() => {
             this.templateName = templateNameChecked;
@@ -139,8 +138,8 @@ export class NewTemplatesPage implements OnInit {
           })
         }
         else if (typeOfAction == "Create Crisis Plan") {
-          let planNameChecked = await this.templateService.checkDuplicateName('plan', alertData);
-          this.router.navigateByUrl("/tabs/plans/details/" + this.defaultLanguage + "/" + planNameChecked, {replaceUrl: true});
+          let planNameChecked = await this.templateService.checkDuplicateNameInApp('plan', alertData);
+          this.router.navigateByUrl("/tabs/plans/details/" + this.defaultLanguage + "/" + this.templateService.encodeURIComponent(planNameChecked), {replaceUrl: true});
         }
         else {
           this.addTemplate(templateNameChecked);
@@ -152,6 +151,7 @@ export class NewTemplatesPage implements OnInit {
 
   ionViewWillEnter() {
     this.android = this.templateService.checkPlatformAndroid();
+    this.templateService.setGlobalSettings();
     this.frontViewData = this.templateService.frontViewData;
   }
 

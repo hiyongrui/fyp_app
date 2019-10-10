@@ -26,32 +26,32 @@ export class SharePage implements OnInit {
 
   async exportJSON(type) {
     let data = type == 'plan' ? await this.planService.getAllPlan() : await this.templateService.getAllTemplate("templateKey");
+    let collator = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'}); //sort name a - z , name, name (1), name (2)
+    data.sort((a,b) => type == 'plan' ? collator.compare(a.planName, b.planName) : collator.compare(a.name, b.name));
     let json = {type, data};
     let fileName = type == 'plan' ? 'allPlans' : 'allTemplates';
-    console.warn("json data export", json);
     this.templateService.exportJSON(json, fileName);
   }
 
   readFile(fullPath) {
     let filePath = fullPath.substring(0, fullPath.lastIndexOf("/") + 1);
     let fileName = fullPath.substring(filePath.length);
-    console.error("file path", filePath, "\nfile name", fileName);
     this.file.readAsBinaryString(filePath, fileName).then(data => {
-      
       let jsonObj = JSON.parse(data);
-      console.warn("JSON obj imported", jsonObj);
-
+      if (jsonObj.identifier !== "Crisis Management") {
+        this.templateService.presentToastWithOptions("Invalid file!");
+        return false;
+      }
       jsonObj.type == "plan" ? this.planService.addPlanFromSharing(jsonObj.data, jsonObj.type) : this.templateService.addTemplateFromSharing(jsonObj.data, jsonObj.type);
-
     }).catch(err => this.templateService.throwError("Error reading file!", err));
   }
 
   
   openAndroid() {
     this.fileChooser.open({mime: "text/plain"}).then(uri => {
-      console.warn("android uri", uri); //content://com.android.providers.downloads.documents/document/raw%3A%2Fstorage%2Femulated%2F0%2FDownload%2Fsampleionicfile.json
+      // android uri = content://com.android.providers.downloads.documents/document/raw%3A%2Fstorage%2Femulated%2F0%2FDownload%2Fsampleionicfile.txt
       this.filePath.resolveNativePath(uri).then(resolvedFilePath => {
-        console.error("resolved", resolvedFilePath); //file:///storage/emulated/0/Download/sampleionicfile.json
+        // native path resolved = file:///storage/emulated/0/Download/sampleionicfile.txt
         this.readFile(resolvedFilePath);
       })
     }).catch(() => {});
@@ -59,7 +59,7 @@ export class SharePage implements OnInit {
 
   openIOS() {
     this.filePicker.pickFile("public.text").then(uri => {
-      console.warn("ios uri", uri);
+      // ios uri = /private/var/mobile/Containers/Data/Application/xxx/tmp/io.ionic.name/sampleionicfile.txt
       let resolvedFilePath = "file:///" + uri;
       this.readFile(resolvedFilePath);
     }).catch(() => {});

@@ -86,6 +86,12 @@
   }
 
   .blur {
+    background-color: #FFF;
+    position: absolute;
+    z-index: -1 !important;
+  }
+
+  .originalBlurNotWorkingInIOS {
     filter: blur(15px);
     -webkit-filter: blur(15px);
     opacity: 1;
@@ -95,9 +101,8 @@
     width: 100%;
     position: absolute;
   }
-
+  
   .blurTitle {
-
     filter: blur(15px);
     -webkit-filter: blur(15px);
     /* transition: -webkit-filter 200ms linear; */
@@ -193,7 +198,7 @@
   .label-stacked.sc-ion-label-ios-h {
     margin-bottom: 0px;
   }
-  p {
+  p { /*remove spacing on top and bottom of text */
     margin-top: 0px;
     margin-bottom: 0px;
   }
@@ -250,7 +255,8 @@
                   </ion-label>
                   <ion-input formControlName="detailname" type="text"></ion-input>
                 </ion-item>
-                <p *ngIf="something.controls['detailname'].invalid && submitted" style="color:red">Name required</p>
+                <p *ngIf="something.controls['detailname'].value.trim().length == 0 && submitted" style="color:red">Name required</p>
+                <p *ngIf="something.controls['detailname'].value.trim().length > 0 && something.controls['detailname'].invalid && submitted" style="color:red">Name too long</p>
               </ion-col>
               <ion-col style="padding-top:0px;" [ngClass]="android ? 'minHeightAndroid' : 'planDetailItem'">
                 <ion-item no-padding>
@@ -267,7 +273,8 @@
                   <ion-label position="floating"> TCS Name </ion-label>
                   <ion-input formControlName="detailtcs" type="text"></ion-input>
                 </ion-item>
-                <p *ngIf="something.controls['detailtcs'].invalid && submitted" style="color:red">TCS name required</p>
+                <p *ngIf="something.controls['detailtcs'].value.trim().length == 0 && submitted" style="color:red">TCS name required</p>
+                <p *ngIf="something.controls['detailtcs'].value.trim().length > 0 && something.controls['detailtcs'].invalid && submitted" style="color:red">TCS name too long</p>
               </ion-col>
               <ion-col style="padding-top:0px;">
                 <ion-item no-padding [ngClass]="android ? 'minHeightAndroid' : 'planDetailItem'">
@@ -358,9 +365,10 @@
 
 
       <!-- shown when pressed edit-->
-      <ion-list style="background-color: #d3d3d3" #mylist
+      <ion-list #mylist
         [ngClass]="globalItem.toggle ? 'addPaddingTopBottom' : 'removePaddingTopBottom'" *ngIf="!isDisabled">
 
+        <ng-container *ngIf="!globalItem.toggle">
         <ion-row *ngFor="let item of getArray(globalItem.id); let symptomIndex = index; let last = last" [style.border-bottom]="!last && '2px solid #A9A9A9'"
           [ngClass]="{'blur': globalItem.toggle}">
 
@@ -451,7 +459,7 @@
           </ng-container>
 
         </ion-row>
-
+        </ng-container>
 
         <ion-row style="height:150px;" [ngClass]="{'blur': globalItem.toggle}" *ngIf="!checkType(globalItem.id)">
         </ion-row>

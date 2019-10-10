@@ -47,7 +47,6 @@ export class ViewTemplatesPage implements OnInit {
   loadTemplates() {
     this.templateService.getAllTemplate("templateKey").then(val => {
       val = val || []; //prevent null if val empty at start no storage
-      console.warn("view template", val);
       this.allTemplate = val.map((element, index) => {
         element.templates.forEach(x => {
           x.length && x.forEach(y => {

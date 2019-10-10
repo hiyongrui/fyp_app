@@ -120,10 +120,9 @@ export class PlanService {
       data = data || [];
       plansToAdd.forEach(element => {
         let checkIndex = data.findIndex(x => x.id == element.id);
-        element.name = this.templateService.checkNameCounter(data, type, element.name);
+        element.planName = this.templateService.checkDuplicateNameFromSharing(data, type, element.planName, checkIndex);
         checkIndex > -1 ? data[checkIndex] = element : data.unshift(element);
       });
-      console.log("plans array set", data);
       this.templateService.presentToastWithOptions(plansToAdd.length + " plan imported successfully");
       return this.storage.set(key, data)
     })

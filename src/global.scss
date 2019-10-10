@@ -116,7 +116,7 @@ ion-card-title {
 // .alert-button-inner.sc-ion-alert-md {
 //     color: #3880FF;
 // }
-.deleteRedBtn {
+.deleteRedBtn, .deleteRedBtn > .alert-button-inner.sc-ion-alert-ios {
     font-weight: 700 !important;
     color: red !important;
 }
@@ -141,10 +141,12 @@ ion-card-title {
 .addPaddingTopBottom {
     padding-top: 3%;
     padding-bottom: 3%;
+    background-color: #FFF;
 }
 .removePaddingTopBottom {
     padding-top: 0px;
     padding-bottom: 0px;
+    background-color: #d3d3d3;
 }
 .labelFocused {
     color:#007aff !important;

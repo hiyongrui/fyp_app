@@ -90,6 +90,12 @@ ion-content{
   }
 
   .blur {
+    background-color: #FFF;
+    position: absolute;
+    z-index: -1 !important;
+  }
+
+  .originalBlurNotWorkingInIOS {
     filter: blur(15px);
     -webkit-filter: blur(15px);
     opacity: 1;
@@ -99,9 +105,8 @@ ion-content{
     width: 100%;
     position: absolute;
   }
-
+ 
   .blurTitle {
-
     filter: blur(15px);
     -webkit-filter: blur(15px);
     /* transition: -webkit-filter 200ms linear; */
@@ -196,7 +201,7 @@ ion-content{
   .labelAlign {
     padding-left: 32px;
   }
-  p {
+  p { /*remove spacing on top and bottom of text */
     margin-top: 0px;
     margin-bottom: 0px;
   }
@@ -272,9 +277,12 @@ ion-content{
 
 
       <!-- <div> -->
-      <ion-list style="background-color: #d3d3d3" *ngIf="!viewPage || editPage" #mylist
+      <ion-list *ngIf="!viewPage || editPage" #mylist
         [ngClass]="globalItem.toggle ? 'addPaddingTopBottom' : 'removePaddingTopBottom'">
         <!--https://forum.ionicframework.com/t/fab-button-backdrop/80019-->
+
+        <ng-container *ngIf="!globalItem.toggle">
+          
         <ion-row *ngFor="let item of getArray(globalItem.id); let symptomIndex = index; let last = last"
           [style.border-bottom]="!last && '2px solid #A9A9A9'" [ngClass]="{'blur': globalItem.toggle}">
           <!-- first column aka symptom -->
@@ -357,6 +365,7 @@ ion-content{
           </ng-container>
 
         </ion-row>
+        </ng-container>
 
 
         <ion-row style="height:150px;" [ngClass]="{'blur': globalItem.toggle}" *ngIf="!checkType(globalItem.id)">
