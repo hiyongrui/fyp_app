@@ -178,19 +178,20 @@ export class TemplateService {
   selectRadio(defaultLanguage) {
     let completedArray = this.getAllArray();
 
-    completedArray.forEach(eachArr => {
+    completedArray.forEach(mainArray => {
 
-      eachArr.forEach(x => {
+      mainArray.forEach(symptomActionPair => {
 
-        let oneSetting = this.settingSymptom.find(thisSetting => thisSetting.id == x.symptom.symptomID);
-        oneSetting ? 
-          x.symptom.text = [oneSetting.enName, oneSetting.chName, oneSetting.myName, oneSetting.tmName][defaultLanguage] || oneSetting.enName
-          : x.symptom.text = this.globalSymptom[defaultLanguage];
-        x.combined.forEach(element => {
-          let oneAction = this.settingAction.find(thisSetting => thisSetting.id == element.actionID);
+        let oneSymptom = this.settingSymptom.find(thisSymptom => thisSymptom.id == symptomActionPair.symptom.symptomID);
+        oneSymptom ? 
+        symptomActionPair.symptom.text = this.returnLanguage(oneSymptom, defaultLanguage)
+          : symptomActionPair.symptom.text = this.globalSymptom[defaultLanguage];
+
+        symptomActionPair.combined.forEach(action => {
+          let oneAction = this.settingAction.find(thisAction => thisAction.id == action.actionID);
           oneAction ?
-            element.text = [oneAction.enName, oneAction.chName, oneAction.myName, oneAction.tmName][defaultLanguage] || oneAction.enName
-            : element.text = this.globalAction[defaultLanguage];
+          action.text = this.returnLanguage(oneAction, defaultLanguage)
+            : action.text = this.globalAction[defaultLanguage];
         });
       })
     })
@@ -242,10 +243,14 @@ export class TemplateService {
     this.backUpWarningArray = JSON.parse(JSON.stringify(this.warningArray));
     this.backUpGoodArray = JSON.parse(JSON.stringify(this.goodArray));
     this.backUpAppointment = JSON.parse(JSON.stringify(this.appointment));
+    this.changeTextBasedOnLanguage(defaultLanguage, false);
+  }
+
+  changeTextBasedOnLanguage(defaultLanguage, checkForEmptyActionOnly) {
     let completedArray = this.getAllArray();
-    completedArray.forEach(element => {
-      element.forEach(array => {
-        if (array.combined.length == 0) {
+    completedArray.forEach(mainArray => {
+      mainArray.forEach(symptomActionPair => {
+        if (symptomActionPair.combined.length == 0) {
           let newAction = {
             id: uuid(),
             // text: "Action",
@@ -255,13 +260,13 @@ export class TemplateService {
             description: "",
             actionID: ""
           }
-          array.combined.push(newAction);
+          symptomActionPair.combined.push(newAction);
         }
-        else {
-          this.settingService.getOneSetting("Symptom", array.symptom.symptomID).then(thisSymptom => {
-            array.symptom.text = this.returnLanguage(thisSymptom, defaultLanguage);
+        else if (!checkForEmptyActionOnly) {
+          this.settingService.getOneSetting("Symptom", symptomActionPair.symptom.symptomID).then(thisSymptom => {
+            symptomActionPair.symptom.text = this.returnLanguage(thisSymptom, defaultLanguage);
           })
-          array.combined.forEach(action => {
+          symptomActionPair.combined.forEach(action => {
             if (action.actionID) {
               this.settingService.getOneSetting("Action", action.actionID).then(thisAction => {
                 action.text = this.returnLanguage(thisAction, defaultLanguage);

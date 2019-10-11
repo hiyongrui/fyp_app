@@ -32,6 +32,7 @@ export class NewTemplatesPage implements OnInit {
   constructor(private router: Router, private templateService: TemplateService, private alertCtrl: AlertController, 
     private event: Events, private file: File, private loadingController: LoadingController, private fileOpener: FileOpener) {
       this.event.subscribe("createTemplateFromPlan", language => {
+        this.templateService.changeTextBasedOnLanguage(language, true);
         this.defaultLanguage = language;
       })
       this.event.subscribe("view", item => { //or services https://stackoverflow.com/questions/54304481/ionic-4-angular-7-passing-object-data-to-another-page

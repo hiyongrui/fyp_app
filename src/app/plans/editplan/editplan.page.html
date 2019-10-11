@@ -90,7 +90,7 @@
     position: absolute;
     z-index: -1 !important;
   }
-
+  /*NOTE: .blur not in usage anymore and css can be removed in html element, as changed to if toggle on/off */
   .originalBlurNotWorkingInIOS {
     filter: blur(15px);
     -webkit-filter: blur(15px);
@@ -366,7 +366,7 @@
 
       <!-- shown when pressed edit-->
       <ion-list #mylist
-        [ngClass]="globalItem.toggle ? 'addPaddingTopBottom' : 'removePaddingTopBottom'" *ngIf="!isDisabled">
+        [ngClass]="globalItem.toggle ? 'toggleOnColorWhiteAddPaddingTopBottom' : 'toggleOffColorGreyRemovePaddingTopBottom'" *ngIf="!isDisabled">
 
         <ng-container *ngIf="!globalItem.toggle">
         <ion-row *ngFor="let item of getArray(globalItem.id); let symptomIndex = index; let last = last" [style.border-bottom]="!last && '2px solid #A9A9A9'"

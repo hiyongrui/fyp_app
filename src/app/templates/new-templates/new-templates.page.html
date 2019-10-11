@@ -94,7 +94,7 @@ ion-content{
     position: absolute;
     z-index: -1 !important;
   }
-
+  /*NOTE: .blur not in usage anymore and css can be removed in html element, as changed to if toggle on/off */
   .originalBlurNotWorkingInIOS {
     filter: blur(15px);
     -webkit-filter: blur(15px);
@@ -278,7 +278,7 @@ ion-content{
 
       <!-- <div> -->
       <ion-list *ngIf="!viewPage || editPage" #mylist
-        [ngClass]="globalItem.toggle ? 'addPaddingTopBottom' : 'removePaddingTopBottom'">
+        [ngClass]="globalItem.toggle ? 'toggleOnColorWhiteAddPaddingTopBottom' : 'toggleOffColorGreyRemovePaddingTopBottom'">
         <!--https://forum.ionicframework.com/t/fab-button-backdrop/80019-->
 
         <ng-container *ngIf="!globalItem.toggle">

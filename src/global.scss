@@ -138,12 +138,12 @@ ion-card-title {
     border: 1px solid lightgray;
 }
 
-.addPaddingTopBottom {
+.toggleOnColorWhiteAddPaddingTopBottom {
     padding-top: 3%;
     padding-bottom: 3%;
     background-color: #FFF;
 }
-.removePaddingTopBottom {
+.toggleOffColorGreyRemovePaddingTopBottom {
     padding-top: 0px;
     padding-bottom: 0px;
     background-color: #d3d3d3;
